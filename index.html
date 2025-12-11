@@ -1,0 +1,842 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8" />
+    <title>نظام الاتصالات الداخلي - وزارة الخارجية</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link rel="stylesheet" href="styles.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+
+<body>
+
+    <!-- Progress Flow Indicator -->
+    <div class="flow-progress">
+        <div class="progress-step" data-step="mofa-login">
+            <i class="fas fa-building"></i>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="sso-auth">
+            <i class="fas fa-shield-alt"></i>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="verify">
+            <i class="fas fa-check-circle"></i>
+        </div>
+        <div class="progress-line"></div>
+        <div class="progress-step" data-step="mofa-access">
+            <i class="fas fa-user-check"></i>
+        </div>
+    </div>
+
+    <!-- Status Notification -->
+    <div class="status-notification" id="status-notification"></div>
+
+    <!-- Header -->
+    <header class="main-header">
+        <div class="header-content">
+            <div class="logo-area">
+                <img src="mofa_logo.svg" alt="MOFA Logo" class="mofa-logo-img" />
+                <div class="header-text">
+                    <h1>وزارة الخارجية</h1>
+                    <p class="subtitle">نظام الاتصالات الداخلي</p>
+                </div>
+            </div>
+            <div class="header-nav">
+                <span class="auth-badge-header" id="header-auth-status">
+                    <i class="fas fa-lock"></i>
+                </span>
+                <div class="connection-indicator" id="connection-status">
+                    <span class="pulse-dot"></span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main>
+        <!-- Screen: Scenario Menu -->
+        <section id="screen-scenario-menu" class="screen active">
+            <div class="screen-container">
+                <div class="menu-header">
+                    <img src="mofa_logo.svg" alt="MOFA" class="menu-logo" />
+                    <h1>نظام وزارة الخارجية - عرض توضيحي</h1>
+                    <p class="menu-subtitle">اختر السيناريو المراد عرضه</p>
+                </div>
+
+                <div class="scenarios-grid">
+                    <!-- Scenario 0: Onboarding & SDK -->
+                    <div class="scenario-card" data-scenario="onboarding">
+                        <div class="scenario-icon warning">
+                            <i class="fas fa-cogs"></i>
+                        </div>
+                        <h3>الإعداد الأولي</h3>
+                        <p class="scenario-desc">إعداد SDK ونفاذ وتعيين الصلاحيات</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">6 خطوات</span>
+                    </div>
+
+                    <!-- Scenario 1: Normal Flow -->
+                    <div class="scenario-card" data-scenario="normal">
+                        <div class="scenario-icon success">
+                            <i class="fas fa-user-check"></i>
+                        </div>
+                        <h3>التدفق العادي</h3>
+                        <p class="scenario-desc">مستخدم دبلوماسي بصلاحيات كاملة</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">9 خطوات</span>
+                    </div>
+
+                    <!-- Scenario 2: Unauthorized Access -->
+                    <div class="scenario-card" data-scenario="unauthorized">
+                        <div class="scenario-icon danger">
+                            <i class="fas fa-ban"></i>
+                        </div>
+                        <h3>محاولة وصول غير مصرح</h3>
+                        <p class="scenario-desc">عرض RBAC و SOC و MDR</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">8 خطوات</span>
+                    </div>
+
+                    <!-- Scenario 3: SOC Dashboard -->
+                    <div class="scenario-card" data-scenario="soc">
+                        <div class="scenario-icon primary">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h3>لوحة فريق الأمن</h3>
+                        <p class="scenario-desc">مركز العمليات الأمنية</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">عرض شامل</span>
+                    </div>
+
+                    <!-- Scenario 4: UBA Dashboard -->
+                    <div class="scenario-card" data-scenario="uba">
+                        <div class="scenario-icon info">
+                            <i class="fas fa-chart-line"></i>
+                        </div>
+                        <h3>تحليل سلوك المستخدم</h3>
+                        <p class="scenario-desc">كشف الأنماط الشاذة - UBA</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">تحليلات متقدمة</span>
+                    </div>
+
+                    <!-- Scenario 6: AD Compromise Protection -->
+                    <div class="scenario-card" data-scenario="adcompromise">
+                        <div class="scenario-icon security">
+                            <i class="fas fa-user-shield"></i>
+                        </div>
+                        <h3>حماية من اختراق AD</h3>
+                        <p class="scenario-desc">البيانات آمنة حتى لو تم اختراق Active Directory</p>
+                        <div class="scenario-steps">
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                            <i class="fas fa-circle"></i>
+                        </div>
+                        <span class="scenario-badge">6 خطوات</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: MOFA Login -->
+        <section id="screen-mofa-login" class="screen active">
+            <div class="screen-container">
+                <div class="login-card">
+                    <div class="card-header">
+                        <img src="mofa_logo.svg" alt="MOFA" class="logo-large" />
+                        <h2>نظام الاتصالات الداخلي</h2>
+                        <p>المراسلات الدبلوماسية الآمنة</p>
+                    </div>
+                    <button class="btn-primary-large" id="btn-login">
+                        <i class="fas fa-sign-in-alt"></i>
+                        <span>تسجيل الدخول عبر نفاذ الوطني</span>
+                    </button>
+                    <div class="info-grid">
+                        <div class="info-item">
+                            <i class="fas fa-clipboard-check"></i>
+                            <span>جهة معتمدة</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-key"></i>
+                            <span>توثيق آمن</span>
+                        </div>
+                        <div class="info-item">
+                            <i class="fas fa-cog"></i>
+                            <span>SDK v2.1</span>
+                        </div>
+                    </div>
+                    <div class="current-user-display" id="current-user-card">
+                        <!-- Populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Redirect Loading -->
+        <section id="screen-redirect" class="screen">
+            <div class="screen-container">
+                <div class="redirect-animation">
+                    <div class="system-badge">
+                        <img src="mofa_logo.svg" alt="MOFA" class="system-icon" />
+                        <span>MOFA</span>
+                    </div>
+                    <div class="transfer-indicator">
+                        <div class="arrow-flow">
+                            <i class="fas fa-arrow-left"></i>
+                            <i class="fas fa-arrow-left"></i>
+                            <i class="fas fa-arrow-left"></i>
+                        </div>
+                    </div>
+                    <div class="system-badge nafath-badge">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>نفاذ</span>
+                    </div>
+                </div>
+                <div class="loading-text">جاري التحويل إلى منصة نفاذ الوطنية...</div>
+                <div class="loading-dots">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Nafath SSO Login -->
+        <section id="screen-sso-login" class="screen">
+            <div class="screen-container">
+                <div class="nafath-card">
+                    <div class="nafath-header">
+                        <div class="nafath-logo">
+                            <i class="fas fa-shield-alt"></i>
+                        </div>
+                        <h2>نفاذ الوطني</h2>
+                        <p>منصة الدخول الموحد</p>
+                    </div>
+                    <form class="nafath-form">
+                        <div id="sso-step-1">
+                            <div class="form-group">
+                                <label><i class="fas fa-id-card"></i> رقم الهوية / الإقامة</label>
+                                <input id="sso-username" type="text" placeholder="١XXXXXXXXX" />
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-lock"></i> كلمة المرور</label>
+                                <input id="sso-password" type="password" placeholder="••••••••" />
+                            </div>
+                        </div>
+                        <div id="sso-otp-wrapper" style="display:none;">
+                            <div class="otp-info">
+                                <i class="fas fa-mobile-alt"></i>
+                                <p>تم إرسال رمز التحقق إلى جوالك المسجل</p>
+                            </div>
+                            <div class="form-group">
+                                <label><i class="fas fa-key"></i> رمز التحقق</label>
+                                <input id="sso-otp" type="text" maxlength="6" placeholder="• • • • • •"
+                                    class="otp-input" />
+                            </div>
+                        </div>
+                        <button type="button" class="btn-nafath-submit" id="sso-next">
+                            <span id="btn-text">التالي</span>
+                            <i class="fas fa-arrow-left"></i>
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Device Verification -->
+        <section id="screen-device-verify" class="screen">
+            <div class="screen-container">
+                <div class="verify-card">
+                    <div class="verify-icon-container">
+                        <i class="fas fa-mobile-alt verify-icon"></i>
+                    </div>
+                    <h3>التحقق الأمني</h3>
+                    <div class="verify-steps">
+                        <div class="verify-step" id="verify-1">
+                            <i class="fas fa-search"></i>
+                            <span>التحقق من الجهاز</span>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                        <div class="verify-step" id="verify-2">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>التحقق من الموقع</span>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                        <div class="verify-step" id="verify-3">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>فحص الأمان</span>
+                            <i class="fas fa-check-circle check-icon"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Session Creation -->
+        <section id="screen-session-create" class="screen">
+            <div class="screen-container">
+                <div class="session-card">
+                    <div class="session-spinner">
+                        <div class="spinner-ring"></div>
+                        <div class="spinner-ring delay-1"></div>
+                        <div class="spinner-ring delay-2"></div>
+                        <i class="fas fa-link session-icon"></i>
+                    </div>
+                    <h3>إنشاء جلسة آمنة</h3>
+                    <div class="session-details">
+                        <div class="detail-item">
+                            <i class="fas fa-key"></i>
+                            <span>تشفير الجلسة</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-clock"></i>
+                            <span>تحديد المدة</span>
+                        </div>
+                        <div class="detail-item">
+                            <i class="fas fa-user-shield"></i>
+                            <span>ربط الصلاحيات</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: MOFA Dashboard -->
+        <section id="screen-mofa-dashboard" class="screen">
+            <div class="screen-container">
+                <div class="welcome-section">
+                    <div class="success-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>أهلاً بك في نظام الاتصالات</h2>
+                </div>
+                <div class="modules-grid" id="modules-grid">
+                    <!-- Populated dynamically by JavaScript with RBAC controls -->
+                </div>
+                <div class="session-footer">
+                    <div class="session-info">
+                        <i class="fas fa-lock"></i>
+                        <span>جلسة آمنة</span>
+                    </div>
+                    <div class="session-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="session-timer">00:00</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Access Attempt Indicator -->
+        <section id="screen-access-attempt" class="screen">
+            <div class="screen-container">
+                <div class="attempt-card">
+                    <div id="access-attempt-indicator"></div>
+                    <div class="loading-spinner">
+                        <div class="spinner"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Access Denied -->
+        <section id="screen-access-denied" class="screen">
+            <div class="screen-container">
+                <div class="access-denied-card">
+                    <div class="denied-icon">
+                        <i class="fas fa-ban"></i>
+                    </div>
+                    <h2>تم رفض الوصول</h2>
+                    <p class="denied-message">ليس لديك صلاحية للوصول إلى هذه الوحدة</p>
+                    <div class="violation-info" id="denied-info"></div>
+                    <div class="alert-box">
+                        <i class="fas fa-exclamation-triangle"></i>
+                        <span>تم تسجيل هذه المحاولة وإرسال تنبيه لفريق الأمن السيبراني</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: SOC Alert -->
+        <section id="screen-soc-alert" class="screen">
+            <div class="screen-container">
+                <div class="soc-alert-card">
+                    <div class="alert-header">
+                        <div class="alert-icon-large">
+                            <i class="fas fa-bell"></i>
+                        </div>
+                        <h2>تنبيه أمن سيبراني</h2>
+                        <p>إرسال تنبيه إلى فريق العمليات الأمنية (SOC)</p>
+                    </div>
+                    <div class="alert-body" id="soc-alert-content"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: MDR Integration (SITE.sa) -->
+        <section id="screen-mdr-integration" class="screen">
+            <div class="screen-container">
+                <div class="mdr-card">
+                    <div class="mdr-header">
+                        <div class="site-logo">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>SITE.sa</span>
+                        </div>
+                        <h2>الاستجابة المُدارة للتهديدات</h2>
+                        <p>Managed Detection & Response Provider</p>
+                    </div>
+                    <div class="mdr-body" id="mdr-content"></div>
+                    <div class="mdr-status">
+                        <i class="fas fa-check-circle"></i>
+                        <span>تم إرسال الحدث الأمني إلى SITE.sa بنجاح</span>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: SOC Dashboard -->
+        <section id="screen-soc-dashboard" class="screen">
+            <div class="screen-container">
+                <div class="soc-dashboard-card">
+                    <div class="dashboard-header">
+                        <h2>
+                            <i class="fas fa-shield-alt"></i>
+                            لوحة فريق الأمن السيبراني
+                        </h2>
+                        <p>Security Operations Center (SOC) Dashboard</p>
+                    </div>
+
+                    <div class="metrics-grid">
+                        <div class="metric-card">
+                            <div class="metric-icon events">
+                                <i class="fas fa-exclamation-circle"></i>
+                            </div>
+                            <div class="metric-value" id="total-events">0</div>
+                            <div class="metric-label">إجمالي الأحداث</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon high">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="metric-value" id="high-severity">0</div>
+                            <div class="metric-label">مستوى عالي</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-icon mdr">
+                                <i class="fas fa-broadcast-tower"></i>
+                            </div>
+                            <div class="metric-value" id="mdr-status">-</div>
+                            <div class="metric-label">حالة MDR</div>
+                        </div>
+                    </div>
+
+                    <div class="events-table-container">
+                        <h3>أحدث الأحداث الأمنية</h3>
+                        <table class="events-table">
+                            <thead>
+                                <tr>
+                                    <th>ID</th>
+                                    <th>الوقت</th>
+                                    <th>المستخدم</th>
+                                    <th>الدور</th>
+                                    <th>الوحدة</th>
+                                    <th>الخطورة</th>
+                                </tr>
+                            </thead>
+                            <tbody id="events-tbody"></tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: Logout -->
+        <section id="screen-logout" class="screen">
+            <div class="screen-container">
+                <div class="logout-card">
+                    <div class="logout-icon">
+                        <i class="fas fa-sign-out-alt"></i>
+                    </div>
+                    <h3>جاري تسجيل الخروج...</h3>
+                </div>
+            </div>
+        </section>
+
+        <!-- Screen: SSO Quick (for abbreviated auth) -->
+        <section id="screen-sso-quick" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Module Success -->
+        <section id="screen-module-success" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Event Logged -->
+
+        <!-- Screen: SDK Setup -->
+        <section id="screen-sdk-setup" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Nafath Config -->
+        <section id="screen-nafath-config" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: RBAC Admin Panel -->
+        <section id="screen-rbac-admin" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Assign Permissions -->
+        <section id="screen-assign-permissions" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Test Auth -->
+        <section id="screen-test-auth" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Deployment Ready -->
+        <section id="screen-deployment-ready" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: User Permissions -->
+        <section id="screen-user-permissions" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+        <section id="screen-event-logged" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: UBA Dashboard -->
+
+        <!-- Screen: AD Breach -->
+        <section id="screen-ad-breach" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Attacker Attempt -->
+        <section id="screen-attacker-attempt" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: SSO Required -->
+        <section id="screen-sso-required" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: No OTP -->
+        <section id="screen-no-otp" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Access Blocked -->
+        <section id="screen-access-blocked" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+
+        <!-- Screen: Data Safe -->
+        <section id="screen-data-safe" class="screen">
+            <div class="screen-container">
+                <!-- Populated dynamically -->
+            </div>
+        </section>
+        <section id="screen-uba-dashboard" class="screen">
+            <div class="screen-container">
+                <div class="uba-dashboard-card">
+                    <div class="dashboard-header">
+                        <h2>
+                            <i class="fas fa-chart-line"></i>
+                            تحليل سلوك المستخدم (UBA)
+                        </h2>
+                        <p>User Behavior Analytics - Anomaly Detection</p>
+                    </div>
+
+                    <!-- UBA Metrics -->
+                    <div class="uba-metrics-grid">
+                        <div class="uba-metric-card risk">
+                            <div class="metric-icon">
+                                <i class="fas fa-exclamation-triangle"></i>
+                            </div>
+                            <div class="metric-value">7</div>
+                            <div class="metric-label">أنماط شاذة مكتشفة</div>
+                        </div>
+                        <div class="uba-metric-card users">
+                            <div class="metric-icon">
+                                <i class="fas fa-users"></i>
+                            </div>
+                            <div class="metric-value">156</div>
+                            <div class="metric-label">مستخدمين نشطين</div>
+                        </div>
+                        <div class="uba-metric-card risk-score">
+                            <div class="metric-icon">
+                                <i class="fas fa-chart-bar"></i>
+                            </div>
+                            <div class="metric-value">38%</div>
+                            <div class="metric-label">متوسط درجة المخاطر</div>
+                        </div>
+                        <div class="uba-metric-card ml">
+                            <div class="metric-icon">
+                                <i class="fas fa-brain"></i>
+                            </div>
+                            <div class="metric-value">AI</div>
+                            <div class="metric-label">التعلم الآلي نشط</div>
+                        </div>
+                    </div>
+
+                    <!-- Anomalies Section -->
+                    <div class="uba-section">
+                        <h3><i class="fas fa-exclamation-circle"></i> الأنماط الشاذة المكتشفة</h3>
+                        <div class="anomalies-list">
+                            <div class="anomaly-item high">
+                                <div class="anomaly-icon">
+                                    <i class="fas fa-clock"></i>
+                                </div>
+                                <div class="anomaly-details">
+                                    <div class="anomaly-title">دخول في وقت غير اعتيادي</div>
+                                    <div class="anomaly-desc">خالد الاستشاري - تسجيل دخول الساعة 03:24 صباحاً</div>
+                                </div>
+                                <div class="anomaly-risk">
+                                    <span class="risk-badge high">عالي</span>
+                                    <span class="risk-value">87%</span>
+                                </div>
+                            </div>
+                            <div class="anomaly-item medium">
+                                <div class="anomaly-icon">
+                                    <i class="fas fa-map-marker-alt"></i>
+                                </div>
+                                <div class="anomaly-details">
+                                    <div class="anomaly-title">موقع جغرافي غير معتاد</div>
+                                    <div class="anomaly-desc">فاطمة الإدارية - تسجيل دخول من خارج السعودية (VPN مكتشف)
+                                    </div>
+                                </div>
+                                <div class="anomaly-risk">
+                                    <span class="risk-badge medium">متوسط</span>
+                                    <span class="risk-value">62%</span>
+                                </div>
+                            </div>
+                            <div class="anomaly-item high">
+                                <div class="anomaly-icon">
+                                    <i class="fas fa-redo"></i>
+                                </div>
+                                <div class="anomaly-details">
+                                    <div class="anomaly-title">محاولات دخول متكررة</div>
+                                    <div class="anomaly-desc">5 محاولات فاشلة متتالية - حساب موقوف مؤقتاً</div>
+                                </div>
+                                <div class="anomaly-risk">
+                                    <span class="risk-badge high">عالي</span>
+                                    <span class="risk-value">91%</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- User Risk Scores -->
+                    <div class="uba-section">
+                        <h3><i class="fas fa-users-cog"></i> درجات المخاطر حسب المستخدم</h3>
+                        <div class="risk-scores-list">
+                            <div class="risk-score-item">
+                                <div class="user-identity">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>أحمد الدبلوماسي</span>
+                                </div>
+                                <div class="risk-bar-container">
+                                    <div class="risk-bar low" style="width: 15%;"></div>
+                                </div>
+                                <div class="risk-value">15%</div>
+                            </div>
+                            <div class="risk-score-item">
+                                <div class="user-identity">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>فاطمة الإدارية</span>
+                                </div>
+                                <div class="risk-bar-container">
+                                    <div class="risk-bar medium" style="width: 35%;"></div>
+                                </div>
+                                <div class="risk-value">35%</div>
+                            </div>
+                            <div class="risk-score-item">
+                                <div class="user-identity">
+                                    <i class="fas fa-user-circle"></i>
+                                    <span>خالد الاستشاري</span>
+                                </div>
+                                <div class="risk-bar-container">
+                                    <div class="risk-bar high" style="width: 72%;"></div>
+                                </div>
+                                <div class="risk-value">72%</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Access Heatmap -->
+                    <div class="uba-section">
+                        <h3><i class="fas fa-fire"></i> خريطة الوصول الحرارية - آخر 7 أيام</h3>
+                        <div class="heatmap-container">
+                            <div class="heatmap-grid">
+                                <!-- Time labels -->
+                                <div class="heatmap-row">
+                                    <div class="heat-label">00-06</div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell high"></div>
+                                </div>
+                                <div class="heatmap-row">
+                                    <div class="heat-label">06-12</div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell very-high"></div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell low"></div>
+                                </div>
+                                <div class="heatmap-row">
+                                    <div class="heat-label">12-18</div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell very-high"></div>
+                                    <div class="heat-cell very-high"></div>
+                                    <div class="heat-cell very-high"></div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell low"></div>
+                                </div>
+                                <div class="heatmap-row">
+                                    <div class="heat-label">18-24</div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell high"></div>
+                                    <div class="heat-cell medium"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell low"></div>
+                                    <div class="heat-cell low"></div>
+                                </div>
+                            </div>
+                            <div class="heatmap-legend">
+                                <span>
+                                    <div class="legend-color low"></div> منخفض
+                                </span>
+                                <span>
+                                    <div class="legend-color medium"></div> متوسط
+                                </span>
+                                <span>
+                                    <div class="legend-color high"></div> عالي
+                                </span>
+                                <span>
+                                    <div class="legend-color very-high"></div> عالي جداً
+                                </span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- Navigation Controls -->
+    <div class="navigation-controls" id="navigation-controls">
+        <div class="nav-content">
+            <button class="nav-btn" id="btn-prev">
+                <i class="fas fa-arrow-right"></i>
+                السابق
+            </button>
+
+            <div class="nav-progress">
+                <div class="scenario-title" id="scenario-title"></div>
+                <div class="progress-container">
+                    <div class="progress-fill" id="progress-bar"></div>
+                </div>
+                <div class="progress-text" id="progress-text"></div>
+            </div>
+
+            <button class="nav-btn primary" id="btn-next">
+                التالي
+                <i class="fas fa-arrow-left"></i>
+            </button>
+        </div>
+        <div class="nav-actions">
+            <button class="nav-btn secondary" id="btn-menu">
+                <i class="fas fa-home"></i>
+                القائمة
+            </button>
+            <button class="nav-btn secondary" id="btn-autoplay">
+                <i class="fas fa-play"></i>
+                تشغيل تلقائي
+            </button>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+
+</html>
