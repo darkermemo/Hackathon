@@ -101,6 +101,21 @@ const SCENARIOS = {
             { id: 'access-blocked', name: 'تم الحظر', screen: 'access-blocked', action: 'showAccessBlocked', duration: 2500 },
             { id: 'data-safe', name: 'البيانات آمنة', screen: 'data-safe', action: 'showDataSafe', duration: 3000 }
         ]
+    },
+    infrastructure: {
+        id: 'infrastructure',
+        name: 'البنية التحتية والتكامل',
+        nameEn: 'Infrastructure & Integrations',
+        icon: 'network-wired',
+        color: 'infra',
+        description: 'حالة الاتصال بـ SIEM و MDR و SDK والخدمات',
+        steps: [
+            { id: 'infra-overview', name: 'نظرة عامة', screen: 'infra-overview', action: 'showInfraOverview', duration: 3000 },
+            { id: 'siem-connection', name: 'اتصال SIEM', screen: 'siem-connection', action: 'showSiemConnection', duration: 2500 },
+            { id: 'mdr-service', name: 'خدمة MDR', screen: 'mdr-service', action: 'showMdrService', duration: 2500 },
+            { id: 'sdk-status', name: 'حالة SDK', screen: 'sdk-status', action: 'showSdkStatus', duration: 2500 },
+            { id: 'connectivity', name: 'حالة الاتصال', screen: 'connectivity', action: 'showConnectivity', duration: 3000 }
+        ]
     }
 };
 
@@ -1191,6 +1206,399 @@ function showDataSafe() {
                                 <li>مصادقة ثنائية إلزامية (National ID + OTP)</li>
                                 <li>حماية من هجمات سرقة بيانات الاعتماد</li>
                             </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+// ==========================================
+// INFRASTRUCTURE & INTEGRATIONS SCENARIO
+// ==========================================
+
+function showInfraOverview() {
+    const screen = document.getElementById('screen-infra-overview');
+    if (screen) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="infra-card">
+                    <div class="infra-header">
+                        <div class="infra-icon">
+                            <i class="fas fa-network-wired"></i>
+                        </div>
+                        <h2>البنية التحتية والتكامل</h2>
+                        <p>Infrastructure & Integrations Overview</p>
+                    </div>
+                    <div class="infra-grid">
+                        <div class="infra-status-card connected">
+                            <div class="status-icon"><i class="fas fa-database"></i></div>
+                            <div class="status-info">
+                                <h4>SIEM</h4>
+                                <p>Syslog UDP/514</p>
+                            </div>
+                            <div class="status-badge online"><i class="fas fa-check-circle"></i> متصل</div>
+                        </div>
+                        <div class="infra-status-card connected">
+                            <div class="status-icon"><i class="fas fa-shield-alt"></i></div>
+                            <div class="status-info">
+                                <h4>MDR Service</h4>
+                                <p>SITE.sa</p>
+                            </div>
+                            <div class="status-badge online"><i class="fas fa-check-circle"></i> نشط</div>
+                        </div>
+                        <div class="infra-status-card connected">
+                            <div class="status-icon"><i class="fas fa-code"></i></div>
+                            <div class="status-info">
+                                <h4>Nafath SDK</h4>
+                                <p>v2.1.0</p>
+                            </div>
+                            <div class="status-badge online"><i class="fas fa-check-circle"></i> جاهز</div>
+                        </div>
+                        <div class="infra-status-card connected">
+                            <div class="status-icon"><i class="fas fa-fingerprint"></i></div>
+                            <div class="status-info">
+                                <h4>Nafath API</h4>
+                                <p>nafath.api.gov.sa</p>
+                            </div>
+                            <div class="status-badge online"><i class="fas fa-check-circle"></i> متصل</div>
+                        </div>
+                    </div>
+                    <div class="infra-summary">
+                        <i class="fas fa-check-double"></i>
+                        <span>جميع الأنظمة تعمل بشكل طبيعي - آخر فحص: ${new Date().toLocaleTimeString('ar-SA')}</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showSiemConnection() {
+    const screen = document.getElementById('screen-siem-connection');
+    if (screen) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="siem-card">
+                    <div class="siem-header">
+                        <div class="siem-icon">
+                            <i class="fas fa-database"></i>
+                        </div>
+                        <h2>اتصال SIEM - Syslog</h2>
+                        <p>Security Information & Event Management</p>
+                    </div>
+                    <div class="siem-config">
+                        <div class="config-section">
+                            <h3><i class="fas fa-cog"></i> إعدادات الاتصال</h3>
+                            <div class="config-grid">
+                                <div class="config-item">
+                                    <span class="label">Protocol:</span>
+                                    <code>UDP / TCP</code>
+                                </div>
+                                <div class="config-item">
+                                    <span class="label">Port:</span>
+                                    <code>514 (Syslog)</code>
+                                </div>
+                                <div class="config-item">
+                                    <span class="label">Server:</span>
+                                    <code>siem.mofa.local</code>
+                                </div>
+                                <div class="config-item">
+                                    <span class="label">Format:</span>
+                                    <code>CEF (Common Event Format)</code>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="config-section">
+                            <h3><i class="fas fa-stream"></i> الأحداث المُرسلة</h3>
+                            <div class="event-types">
+                                <div class="event-type"><i class="fas fa-sign-in-alt"></i> تسجيل الدخول</div>
+                                <div class="event-type"><i class="fas fa-sign-out-alt"></i> تسجيل الخروج</div>
+                                <div class="event-type"><i class="fas fa-ban"></i> محاولات فاشلة</div>
+                                <div class="event-type"><i class="fas fa-exclamation-triangle"></i> انتهاكات RBAC</div>
+                                <div class="event-type"><i class="fas fa-user-secret"></i> أنشطة مشبوهة</div>
+                                <div class="event-type"><i class="fas fa-key"></i> تغيير الصلاحيات</div>
+                            </div>
+                        </div>
+                        <div class="syslog-sample">
+                            <h3><i class="fas fa-terminal"></i> مثال على رسالة Syslog</h3>
+                            <pre><code>CEF:0|MOFA|SSO|2.1|AUTH_SUCCESS|User Login|3|
+src=192.168.1.100 suser=1234567890 
+msg=Nafath authentication successful
+cs1Label=Role cs1=DIPLOMAT
+cs2Label=Permissions cs2=passport.view,consular.access</code></pre>
+                        </div>
+                    </div>
+                    <div class="connection-status success">
+                        <i class="fas fa-plug"></i>
+                        <span>متصل بـ SIEM - آخر رسالة: منذ 3 ثوان</span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showMdrService() {
+    const screen = document.getElementById('screen-mdr-service');
+    if (screen) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="mdr-card">
+                    <div class="mdr-header">
+                        <div class="mdr-logo">
+                            <i class="fas fa-shield-alt"></i>
+                            <span>SITE.sa</span>
+                        </div>
+                        <h2>خدمة MDR - الاستجابة المُدارة</h2>
+                        <p>Managed Detection & Response</p>
+                    </div>
+                    <div class="mdr-features">
+                        <div class="mdr-feature">
+                            <div class="feature-icon"><i class="fas fa-eye"></i></div>
+                            <div class="feature-info">
+                                <h4>المراقبة 24/7</h4>
+                                <p>مراقبة مستمرة على مدار الساعة</p>
+                            </div>
+                            <div class="feature-status active">نشط</div>
+                        </div>
+                        <div class="mdr-feature">
+                            <div class="feature-icon"><i class="fas fa-robot"></i></div>
+                            <div class="feature-info">
+                                <h4>الكشف بالذكاء الاصطناعي</h4>
+                                <p>تحليل السلوك والأنماط الشاذة</p>
+                            </div>
+                            <div class="feature-status active">نشط</div>
+                        </div>
+                        <div class="mdr-feature">
+                            <div class="feature-icon"><i class="fas fa-bolt"></i></div>
+                            <div class="feature-info">
+                                <h4>الاستجابة التلقائية</h4>
+                                <p>حظر فوري للتهديدات</p>
+                            </div>
+                            <div class="feature-status active">نشط</div>
+                        </div>
+                        <div class="mdr-feature">
+                            <div class="feature-icon"><i class="fas fa-file-alt"></i></div>
+                            <div class="feature-info">
+                                <h4>التقارير الدورية</h4>
+                                <p>تقارير أسبوعية وشهرية</p>
+                            </div>
+                            <div class="feature-status active">نشط</div>
+                        </div>
+                    </div>
+                    <div class="mdr-stats">
+                        <div class="stat-item">
+                            <div class="stat-value">47</div>
+                            <div class="stat-label">تهديدات محظورة هذا الشهر</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">99.9%</div>
+                            <div class="stat-label">نسبة التوفر</div>
+                        </div>
+                        <div class="stat-item">
+                            <div class="stat-value">&lt;5min</div>
+                            <div class="stat-label">زمن الاستجابة</div>
+                        </div>
+                    </div>
+                    <div class="mdr-endpoint">
+                        <i class="fas fa-link"></i>
+                        <code>https://mdr.site.sa/api/v1/mofa</code>
+                        <span class="status-dot online"></span>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showSdkStatus() {
+    const screen = document.getElementById('screen-sdk-status');
+    if (screen) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="sdk-status-card">
+                    <div class="sdk-status-header">
+                        <div class="sdk-logo">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h2>حالة SDK - Nafath</h2>
+                        <p>Software Development Kit Status</p>
+                    </div>
+                    <div class="sdk-info-grid">
+                        <div class="sdk-info-item">
+                            <span class="label">الإصدار:</span>
+                            <span class="value">v2.1.0</span>
+                        </div>
+                        <div class="sdk-info-item">
+                            <span class="label">اللغة:</span>
+                            <span class="value">TypeScript / JavaScript</span>
+                        </div>
+                        <div class="sdk-info-item">
+                            <span class="label">Framework:</span>
+                            <span class="value">NestJS 10.x</span>
+                        </div>
+                        <div class="sdk-info-item">
+                            <span class="label">API Version:</span>
+                            <span class="value">v2 (Latest)</span>
+                        </div>
+                    </div>
+                    <div class="sdk-endpoints">
+                        <h3><i class="fas fa-plug"></i> نقاط النهاية (Endpoints)</h3>
+                        <div class="endpoint-list">
+                            <div class="endpoint-item">
+                                <span class="method post">POST</span>
+                                <code>/nafath/auth/initiate</code>
+                                <span class="status-dot online"></span>
+                            </div>
+                            <div class="endpoint-item">
+                                <span class="method post">POST</span>
+                                <code>/nafath/auth/verify</code>
+                                <span class="status-dot online"></span>
+                            </div>
+                            <div class="endpoint-item">
+                                <span class="method get">GET</span>
+                                <code>/nafath/session/:id/status</code>
+                                <span class="status-dot online"></span>
+                            </div>
+                            <div class="endpoint-item">
+                                <span class="method post">POST</span>
+                                <code>/nafath/auth/refresh</code>
+                                <span class="status-dot online"></span>
+                            </div>
+                            <div class="endpoint-item">
+                                <span class="method post">POST</span>
+                                <code>/nafath/auth/logout</code>
+                                <span class="status-dot online"></span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="sdk-health">
+                        <div class="health-item">
+                            <i class="fas fa-heartbeat"></i>
+                            <span>Health Check: Healthy</span>
+                        </div>
+                        <div class="health-item">
+                            <i class="fas fa-clock"></i>
+                            <span>Uptime: 99.95%</span>
+                        </div>
+                        <div class="health-item">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Avg Response: 234ms</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showConnectivity() {
+    const screen = document.getElementById('screen-connectivity');
+    if (screen) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="connectivity-card">
+                    <div class="connectivity-header">
+                        <div class="connectivity-icon">
+                            <i class="fas fa-globe"></i>
+                        </div>
+                        <h2>حالة الاتصال بالخدمات</h2>
+                        <p>Service Connectivity Status</p>
+                    </div>
+                    <div class="services-status">
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-fingerprint"></i>
+                                <div>
+                                    <h4>Nafath API</h4>
+                                    <code>nafath.api.gov.sa</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">23ms</span>
+                                <span class="status-badge online">متصل</span>
+                            </div>
+                        </div>
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <h4>SIEM Server</h4>
+                                    <code>siem.mofa.local:514</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">5ms</span>
+                                <span class="status-badge online">متصل</span>
+                            </div>
+                        </div>
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-shield-alt"></i>
+                                <div>
+                                    <h4>SITE.sa MDR</h4>
+                                    <code>mdr.site.sa</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">45ms</span>
+                                <span class="status-badge online">نشط</span>
+                            </div>
+                        </div>
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-server"></i>
+                                <div>
+                                    <h4>Active Directory</h4>
+                                    <code>ad.mofa.local</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">2ms</span>
+                                <span class="status-badge online">متصل</span>
+                            </div>
+                        </div>
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-database"></i>
+                                <div>
+                                    <h4>PostgreSQL DB</h4>
+                                    <code>db.mofa.local:5432</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">3ms</span>
+                                <span class="status-badge online">متصل</span>
+                            </div>
+                        </div>
+                        <div class="service-row">
+                            <div class="service-info">
+                                <i class="fas fa-memory"></i>
+                                <div>
+                                    <h4>Redis Cache</h4>
+                                    <code>redis.mofa.local:6379</code>
+                                </div>
+                            </div>
+                            <div class="service-metrics">
+                                <span class="latency">1ms</span>
+                                <span class="status-badge online">متصل</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="connectivity-summary">
+                        <div class="summary-stat">
+                            <i class="fas fa-check-circle"></i>
+                            <span>6/6 خدمات متصلة</span>
+                        </div>
+                        <div class="summary-stat">
+                            <i class="fas fa-clock"></i>
+                            <span>آخر فحص: ${new Date().toLocaleTimeString('ar-SA')}</span>
+                        </div>
+                        <div class="summary-stat">
+                            <i class="fas fa-sync"></i>
+                            <span>الفحص التلقائي: كل 30 ثانية</span>
                         </div>
                     </div>
                 </div>

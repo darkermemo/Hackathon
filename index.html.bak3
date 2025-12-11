@@ -620,41 +620,6 @@
         </section>
 
         <!-- Screen: Data Safe -->
-
-        <!-- Screen: Infra Overview -->
-        <section id="screen-infra-overview" class="screen">
-            <div class="screen-container">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
-
-        <!-- Screen: SIEM Connection -->
-        <section id="screen-siem-connection" class="screen">
-            <div class="screen-container">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
-
-        <!-- Screen: MDR Service -->
-        <section id="screen-mdr-service" class="screen">
-            <div class="screen-container">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
-
-        <!-- Screen: SDK Status -->
-        <section id="screen-sdk-status" class="screen">
-            <div class="screen-container">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
-
-        <!-- Screen: Connectivity -->
-        <section id="screen-connectivity" class="screen">
-            <div class="screen-container">
-                <!-- Populated dynamically -->
-            </div>
-        </section>
         <section id="screen-data-safe" class="screen">
             <div class="screen-container">
                 <!-- Populated dynamically -->
