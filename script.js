@@ -116,6 +116,18 @@ const SCENARIOS = {
             { id: 'sdk-status', name: 'حالة SDK', screen: 'sdk-status', action: 'showSdkStatus', duration: 2500 },
             { id: 'connectivity', name: 'حالة الاتصال', screen: 'connectivity', action: 'showConnectivity', duration: 3000 }
         ]
+    },
+    mvp: {
+        id: 'mvp',
+        name: 'تجربة حية (MVP)',
+        nameEn: 'Interactive Live Auth (MVP)',
+        icon: 'keyboard',
+        color: 'danger',
+        description: 'تجربة حية للتحقق من الصلاحيات والمصادقة',
+        steps: [
+            { id: 'mvp-login', name: 'تسجيل الدخول الحي', screen: 'mvp-login', action: 'showMVPLogin', duration: 999999 }, // Long duration for manual interaction
+            { id: 'mvp-verify', name: 'التحقق والقرار', screen: 'mvp-verify', action: 'showMVPVerify', duration: 3000 }
+        ]
     }
 };
 
@@ -1606,6 +1618,189 @@ function showConnectivity() {
         `;
     }
 }
+
+// ==========================================
+// MVP INTERACTIVE SCENARIO
+// ==========================================
+
+let mvpState = {
+    step: 'input', // input, processing, result
+    nationalId: '',
+    status: 'idle'
+};
+
+function showMVPLogin() {
+    const screen = document.getElementById('screen-mvp-login');
+    if (!screen) return;
+
+    // Reset state
+    mvpState = { step: 'input', nationalId: '', status: 'idle' };
+
+    screen.innerHTML = `
+        <div class="screen-container">
+            <div class="login-card interactive-card">
+                <div class="card-header">
+                    <div class="live-badge">Live Demo</div>
+                    <img src="mofa_logo.svg" alt="MOFA" class="logo-large" />
+                    <h2>بوابة الدخول الموحد</h2>
+                    <p>الرجاء إدخال رقم الهوية للتحقق</p>
+                </div>
+                
+                <div class="interactive-form">
+                    <div class="form-group">
+                        <label for="mvp-nid">رقم الهوية الوطنية / الإقامة</label>
+                        <input type="text" id="mvp-nid" placeholder="أدخل رقم الهوية (10 أرقام)" maxlength="10" autocomplete="off">
+                    </div>
+                    
+                    <button class="btn-primary-large" onclick="handleMVPAuth()">
+                        <i class="fas fa-fingerprint"></i>
+                        <span>تحقق عبر نفاذ</span>
+                    </button>
+                </div>
+
+                <div id="mvp-feedback" class="mvp-feedback hidden"></div>
+
+                <div class="test-data-hint">
+                    <small>بيانات للتجربة:</small>
+                    <div class="hint-chips">
+                        <span class="chip" onclick="fillMVP('1055443322')">دبلوماسي (مصرح)</span>
+                        <span class="chip error" onclick="fillMVP('9999999999')">غير مصرح</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+}
+
+function fillMVP(id) {
+    const input = document.getElementById('mvp-nid');
+    if (input) input.value = id;
+}
+
+function handleMVPAuth() {
+    const input = document.getElementById('mvp-nid');
+    const feedback = document.getElementById('mvp-feedback');
+    const nid = input.value.trim();
+
+    if (!nid || nid.length !== 10) {
+        feedback.innerHTML = '<div class="alert error"><i class="fas fa-exclamation-circle"></i> الرجاء إدخال رقم هوية صحيح (10 أرقام)</div>';
+        feedback.classList.remove('hidden');
+        return;
+    }
+
+    // Simulate Processing
+    mvpState.nationalId = nid;
+    mvpState.status = 'processing';
+
+    input.disabled = true;
+    feedback.innerHTML = `
+        <div class="alert info processing">
+            <i class="fas fa-circle-notch fa-spin"></i>
+            <div>
+                <strong>جاري الاتصال بنفاذ...</strong>
+                <div class="process-steps">
+                    <small id="p-step1"><i class="fas fa-check"></i> التحقق من الهوية</small>
+                    <small id="p-step2" class="pending">... فحص الصلاحيات (RBAC)</small>
+                </div>
+            </div>
+        </div>
+    `;
+    feedback.classList.remove('hidden');
+
+    // Simulate Network Delay
+    setTimeout(() => {
+        document.getElementById('p-step2').innerHTML = '<i class="fas fa-circle-notch fa-spin"></i> فحص الصلاحيات (RBAC)';
+        document.getElementById('p-step2').classList.remove('pending');
+
+        setTimeout(() => {
+            // Determine Result
+            // In this MVP, strict logic: Only known IDs are allowed. Random/unknown IDs are blocked.
+            const knownUser = demoUsers.find(u => u.nationalId === nid);
+
+            if (knownUser) {
+                showMVPVerifyResult(true, knownUser);
+            } else {
+                showMVPVerifyResult(false, { nationalId: nid });
+            }
+        }, 1500);
+    }, 1500);
+}
+
+function showMVPVerifyResult(isAuthorized, user) {
+    const screen = document.getElementById('screen-mvp-login');
+    if (!screen) return;
+
+    if (isAuthorized) {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="success-card animated">
+                    <div class="success-icon"><i class="fas fa-check-circle"></i></div>
+                    <h2>تم التحقق بنجاح</h2>
+                    <p>مرحباً، ${user.name}</p>
+                    
+                    <div class="auth-details">
+                        <div class="detail-row">
+                            <span>رقم الهوية:</span>
+                            <strong>${user.nationalId}</strong>
+                        </div>
+                        <div class="detail-row">
+                            <span>الدور الوظيفي:</span>
+                            <span class="role-badge">${user.roleAr}</span>
+                        </div>
+                        <div class="detail-row">
+                            <span>الصلاحيات:</span>
+                            <strong>${user.permissions ? user.permissions.length : 0} صلاحيات نشطة</strong>
+                        </div>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-primary" onclick="showDashboard()">
+                            <i class="fas fa-arrow-left"></i> الدخول للنظام
+                        </button>
+                        <button class="btn-secondary" onclick="showMVPLogin()">
+                            <i class="fas fa-redo"></i> تجربة أخرى
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    } else {
+        screen.innerHTML = `
+            <div class="screen-container">
+                <div class="error-card animated">
+                    <div class="error-icon"><i class="fas fa-ban"></i></div>
+                    <h2>دخول غير مصرح</h2>
+                    <p>رقم الهوية ${user.nationalId} غير مسجل في النظام</p>
+                    
+                    <div class="alert error">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>تم حظر المحاولة وتسجيلها في سجلات الأمن (SIEM)</span>
+                    </div>
+
+                    <div class="log-preview">
+                        <code>SECURITY_ALERT: Unauthorized access attempt detected. ID: ${user.nationalId}. Action: BLOCKED.</code>
+                    </div>
+
+                    <div class="action-buttons">
+                        <button class="btn-secondary" onclick="showMVPLogin()">
+                            <i class="fas fa-redo"></i> المحاولة مرة أخرى
+                        </button>
+                    </div>
+                </div>
+            </div>
+        `;
+    }
+}
+
+function showMVPVerify() {
+    // This step is just a placeholder sequence in the flow, 
+    // the actual logic happens inside showMVPLogin via handleMVPAuth
+    // But if auto-playing, we might land here.
+    if (mvpState.status === 'idle') {
+        showMVPLogin();
+    }
+}
+
 
 // ==========================================
 // INITIALIZATION
