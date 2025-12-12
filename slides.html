@@ -1,0 +1,593 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MOFA SSO - High Level Design</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f5f7fa;
+            padding: 2rem;
+        }
+
+        .slide {
+            background: white;
+            border-radius: 16px;
+            padding: 3rem;
+            margin-bottom: 2rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            max-width: 1100px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        .slide-header {
+            text-align: center;
+            margin-bottom: 3rem;
+            padding-bottom: 1.5rem;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .slide-header h1 {
+            font-size: 2rem;
+            color: #003d5b;
+            font-weight: 900;
+        }
+
+        .slide-header p {
+            color: #6c757d;
+            font-size: 1.1rem;
+            margin-top: 0.5rem;
+        }
+
+        /* SaaS Architecture */
+        .saas-architecture {
+            position: relative;
+        }
+
+        .layer {
+            padding: 1.5rem 2rem;
+            border-radius: 12px;
+            margin-bottom: 1rem;
+        }
+
+        .layer-title {
+            font-size: 0.85rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 1rem;
+            opacity: 0.7;
+        }
+
+        /* Tenants Layer */
+        .tenants-layer {
+            background: linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%);
+            border: 1px solid #90caf9;
+        }
+
+        .tenants-grid {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .tenant-logo {
+            width: 100px;
+            height: 100px;
+            background: white;
+            border-radius: 16px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+            padding: 0.8rem;
+        }
+
+        .tenant-logo img {
+            width: 50px;
+            height: 50px;
+            object-fit: contain;
+        }
+
+        .tenant-logo span {
+            font-size: 0.75rem;
+            font-weight: 600;
+            color: #003d5b;
+            margin-top: 0.5rem;
+        }
+
+        /* SSO Layer */
+        .sso-layer {
+            background: linear-gradient(135deg, #e8f5e9 0%, #c8e6c9 100%);
+            border: 2px solid #4caf50;
+        }
+
+        .sso-box {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 2rem;
+            background: white;
+            padding: 1.5rem 3rem;
+            border-radius: 12px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .sso-box img {
+            height: 60px;
+        }
+
+        .sso-box .sso-text h3 {
+            font-size: 1.3rem;
+            color: #1b5e20;
+        }
+
+        .sso-box .sso-text p {
+            color: #388e3c;
+            font-size: 0.9rem;
+        }
+
+        /* SDK Layer */
+        .sdk-layer {
+            background: linear-gradient(135deg, #fff3e0 0%, #ffe0b2 100%);
+            border: 1px solid #ffb74d;
+        }
+
+        .sdk-modules {
+            display: flex;
+            justify-content: center;
+            gap: 1rem;
+        }
+
+        .sdk-module {
+            background: white;
+            padding: 1rem 1.5rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+            min-width: 120px;
+        }
+
+        .sdk-module i {
+            font-size: 1.5rem;
+            color: #f57c00;
+            margin-bottom: 0.5rem;
+        }
+
+        .sdk-module span {
+            display: block;
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: #e65100;
+        }
+
+        /* Security Layer */
+        .security-layer {
+            background: linear-gradient(135deg, #fce4ec 0%, #f8bbd9 100%);
+            border: 1px solid #f48fb1;
+        }
+
+        .security-services {
+            display: flex;
+            justify-content: center;
+            gap: 1.5rem;
+        }
+
+        .security-service {
+            background: white;
+            padding: 1.2rem 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .security-service i {
+            font-size: 2rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .security-service.siem i {
+            color: #2196f3;
+        }
+
+        .security-service.mdr i {
+            color: #e91e63;
+        }
+
+        .security-service.uba i {
+            color: #9c27b0;
+        }
+
+        .security-service h4 {
+            font-size: 1rem;
+            color: #333;
+        }
+
+        .security-service span {
+            font-size: 0.75rem;
+            color: #666;
+        }
+
+        /* Data Layer */
+        .data-layer {
+            background: linear-gradient(135deg, #ede7f6 0%, #d1c4e9 100%);
+            border: 1px solid #b39ddb;
+        }
+
+        .data-stores {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+        }
+
+        .data-store {
+            background: white;
+            padding: 1rem 2rem;
+            border-radius: 10px;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+        }
+
+        .data-store i {
+            font-size: 2rem;
+            color: #7b1fa2;
+            margin-bottom: 0.5rem;
+        }
+
+        /* Flow Arrows */
+        .flow-arrow {
+            text-align: center;
+            padding: 0.5rem;
+            color: #4caf50;
+            font-size: 1.5rem;
+        }
+
+        /* Simple Flow Diagram */
+        .simple-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 1rem;
+            padding: 2rem;
+            flex-wrap: wrap;
+        }
+
+        .flow-node {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .flow-icon {
+            width: 70px;
+            height: 70px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .flow-icon.user {
+            background: #1976d2;
+        }
+
+        .flow-icon.nafath {
+            background: #388e3c;
+        }
+
+        .flow-icon.otp {
+            background: #7b1fa2;
+        }
+
+        .flow-icon.sdk {
+            background: #f57c00;
+        }
+
+        .flow-icon.rbac {
+            background: #c62828;
+        }
+
+        .flow-icon.app {
+            background: #00838f;
+        }
+
+        .flow-label {
+            font-size: 0.9rem;
+            font-weight: 600;
+            color: #333;
+        }
+
+        .flow-connector {
+            font-size: 1.5rem;
+            color: #4caf50;
+        }
+
+        /* Key Point */
+        .key-point {
+            background: linear-gradient(135deg, #1b5e20 0%, #2e7d32 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 12px;
+            text-align: center;
+            margin-top: 2rem;
+        }
+
+        .key-point h3 {
+            font-size: 1.5rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .key-point p {
+            opacity: 0.9;
+        }
+
+        /* Stats Row */
+        .stats-row {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2rem;
+        }
+
+        .stat-box {
+            text-align: center;
+            padding: 1.5rem 2.5rem;
+            background: #f8f9fa;
+            border-radius: 12px;
+        }
+
+        .stat-box .value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: #003d5b;
+        }
+
+        .stat-box .label {
+            font-size: 0.9rem;
+            color: #666;
+        }
+
+        /* Logo placeholder using emoji/icon */
+        .logo-placeholder {
+            font-size: 2.5rem;
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Slide 1: SaaS Architecture Overview -->
+    <div class="slide">
+        <div class="slide-header">
+            <h1>🏗️ High Level Design - SaaS Architecture</h1>
+            <p>Multi-Tenant SSO Platform with Nafath Integration</p>
+        </div>
+
+        <div class="saas-architecture">
+            <!-- Tenants Layer -->
+            <div class="layer tenants-layer">
+                <div class="layer-title">🏢 Tenants (Government Agencies)</div>
+                <div class="tenants-grid">
+                    <div class="tenant-logo">
+                        <span class="logo-placeholder">🏛️</span>
+                        <span>MOFA</span>
+                    </div>
+                    <div class="tenant-logo">
+                        <span class="logo-placeholder">🛡️</span>
+                        <span>MOI</span>
+                    </div>
+                    <div class="tenant-logo">
+                        <span class="logo-placeholder">🏥</span>
+                        <span>MOH</span>
+                    </div>
+                    <div class="tenant-logo">
+                        <span class="logo-placeholder">📚</span>
+                        <span>MOE</span>
+                    </div>
+                    <div class="tenant-logo">
+                        <span class="logo-placeholder">➕</span>
+                        <span>More...</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- SSO Layer -->
+            <div class="layer sso-layer">
+                <div class="layer-title">🔐 National SSO (نفاذ الوطني)</div>
+                <div class="sso-box">
+                    <span style="font-size: 4rem;">📱</span>
+                    <div class="sso-text">
+                        <h3>Nafath National Platform</h3>
+                        <p>National ID + OTP + Biometric</p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- SDK Layer -->
+            <div class="layer sdk-layer">
+                <div class="layer-title">⚙️ SDK Integration Layer</div>
+                <div class="sdk-modules">
+                    <div class="sdk-module">
+                        <i class="fas fa-code"></i>
+                        <span>Nafath SDK</span>
+                    </div>
+                    <div class="sdk-module">
+                        <i class="fas fa-key"></i>
+                        <span>Auth Service</span>
+                    </div>
+                    <div class="sdk-module">
+                        <i class="fas fa-shield-alt"></i>
+                        <span>RBAC</span>
+                    </div>
+                    <div class="sdk-module">
+                        <i class="fas fa-clipboard-list"></i>
+                        <span>Audit Log</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- Security Layer -->
+            <div class="layer security-layer">
+                <div class="layer-title">🛡️ Security Operations</div>
+                <div class="security-services">
+                    <div class="security-service siem">
+                        <i class="fas fa-database"></i>
+                        <h4>SIEM</h4>
+                        <span>Syslog Events</span>
+                    </div>
+                    <div class="security-service mdr">
+                        <i class="fas fa-shield-alt"></i>
+                        <h4>SITE.sa MDR</h4>
+                        <span>24/7 Monitoring</span>
+                    </div>
+                    <div class="security-service uba">
+                        <i class="fas fa-brain"></i>
+                        <h4>UBA</h4>
+                        <span>AI Detection</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="flow-arrow"><i class="fas fa-arrow-down"></i></div>
+
+            <!-- Data Layer -->
+            <div class="layer data-layer">
+                <div class="layer-title">💾 Data Layer (Isolated per Tenant)</div>
+                <div class="data-stores">
+                    <div class="data-store">
+                        <i class="fas fa-database"></i>
+                        <span>PostgreSQL</span>
+                    </div>
+                    <div class="data-store">
+                        <i class="fas fa-bolt"></i>
+                        <span>Redis Cache</span>
+                    </div>
+                    <div class="data-store">
+                        <i class="fas fa-folder"></i>
+                        <span>Object Store</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Slide 2: Simple Auth Flow -->
+    <div class="slide">
+        <div class="slide-header">
+            <h1>🔄 Authentication Flow</h1>
+            <p>Simple 6-Step Login Process</p>
+        </div>
+
+        <div class="simple-flow">
+            <div class="flow-node">
+                <div class="flow-icon user"><i class="fas fa-user"></i></div>
+                <span class="flow-label">User</span>
+            </div>
+            <span class="flow-connector">→</span>
+            <div class="flow-node">
+                <div class="flow-icon nafath"><i class="fas fa-fingerprint"></i></div>
+                <span class="flow-label">Nafath</span>
+            </div>
+            <span class="flow-connector">→</span>
+            <div class="flow-node">
+                <div class="flow-icon otp"><i class="fas fa-mobile-alt"></i></div>
+                <span class="flow-label">OTP</span>
+            </div>
+            <span class="flow-connector">→</span>
+            <div class="flow-node">
+                <div class="flow-icon sdk"><i class="fas fa-code"></i></div>
+                <span class="flow-label">SDK</span>
+            </div>
+            <span class="flow-connector">→</span>
+            <div class="flow-node">
+                <div class="flow-icon rbac"><i class="fas fa-shield-alt"></i></div>
+                <span class="flow-label">RBAC</span>
+            </div>
+            <span class="flow-connector">→</span>
+            <div class="flow-node">
+                <div class="flow-icon app"><i class="fas fa-check"></i></div>
+                <span class="flow-label">Access</span>
+            </div>
+        </div>
+
+        <div class="key-point">
+            <h3>🔒 External Authentication = Zero Trust</h3>
+            <p>Authentication is handled by Nafath - Independent from internal infrastructure</p>
+        </div>
+    </div>
+
+    <!-- Slide 3: Key Metrics -->
+    <div class="slide">
+        <div class="slide-header">
+            <h1>📊 Platform Metrics</h1>
+            <p>SaaS Performance & Security</p>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="value">99.9%</div>
+                <div class="label">Uptime SLA</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">&lt;5min</div>
+                <div class="label">MDR Response</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">234ms</div>
+                <div class="label">Avg Latency</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">∞</div>
+                <div class="label">Scalable Tenants</div>
+            </div>
+        </div>
+
+        <div class="stats-row">
+            <div class="stat-box">
+                <div class="value">3</div>
+                <div class="label">User Roles</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">17</div>
+                <div class="label">Permissions</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">6</div>
+                <div class="label">Integrations</div>
+            </div>
+            <div class="stat-box">
+                <div class="value">24/7</div>
+                <div class="label">SOC Monitoring</div>
+            </div>
+        </div>
+
+        <div class="key-point" style="margin-top: 2rem;">
+            <h3>🛡️ Even if AD is compromised, data stays 100% safe</h3>
+            <p>Nafath SSO works as an independent security layer - attackers can't bypass without National ID + OTP</p>
+        </div>
+    </div>
+
+</body>
+
+</html>
