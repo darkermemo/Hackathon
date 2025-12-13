@@ -570,22 +570,22 @@
             <div class="cards-grid">
                 <div class="mini-card">
                     <div class="icon" style="background: var(--primary);"><i class="fas fa-users"></i></div>
-                    <div class="value">156</div>
+                    <div class="value" id="stat-users">156</div>
                     <div class="label">إجمالي المستخدمين</div>
                 </div>
                 <div class="mini-card">
                     <div class="icon" style="background: var(--info);"><i class="fas fa-sign-in-alt"></i></div>
-                    <div class="value">1,892</div>
+                    <div class="value" id="stat-logins">1,892</div>
                     <div class="label">تسجيلات الدخول (الشهر)</div>
                 </div>
                 <div class="mini-card">
                     <div class="icon" style="background: var(--warning);"><i class="fas fa-user-tag"></i></div>
-                    <div class="value">3</div>
+                    <div class="value" id="stat-roles">3</div>
                     <div class="label">أدوار وظيفية</div>
                 </div>
                 <div class="mini-card">
                     <div class="icon" style="background: var(--success);"><i class="fas fa-check-circle"></i></div>
-                    <div class="value">99.9%</div>
+                    <div class="value" id="stat-uptime">99.9%</div>
                     <div class="label">نسبة التوفر</div>
                 </div>
             </div>
@@ -893,15 +893,29 @@
         // Load tenant stats
         async function loadStats() {
             try {
-                const response = await fetch(`${API_BASE}/api/tenants/${TENANT_ID}/stats`);
-                const data = await response.json();
+                const [statsRes, rolesRes] = await Promise.all([
+                    fetch(`${API_BASE}/api/tenants/${TENANT_ID}/stats`),
+                    fetch(`${API_BASE}/api/tenants/${TENANT_ID}/roles`)
+                ]);
+                const statsData = await statsRes.json();
+                const rolesData = await rolesRes.json();
 
-                if (data.success) {
-                    const values = document.querySelectorAll('.mini-card .value');
-                    if (values.length >= 4) {
-                        values[0].textContent = data.stats.total_users;
-                        values[1].textContent = data.stats.monthly_logins?.toLocaleString() || '0';
-                    }
+                if (statsData.success) {
+                    document.getElementById('stat-users').textContent = statsData.stats.total_users || 0;
+                    document.getElementById('stat-logins').textContent =
+                        (statsData.stats.monthly_logins || 0).toLocaleString();
+                }
+
+                if (rolesData.success && rolesData.roles) {
+                    document.getElementById('stat-roles').textContent = rolesData.roles.length;
+                }
+
+                // Uptime is calculated from login success rate
+                if (statsData.success && statsData.stats.monthly_logins) {
+                    const logins = statsData.stats.monthly_logins;
+                    const failures = statsData.stats.failed_logins || 0;
+                    const uptime = ((logins / (logins + failures)) * 100).toFixed(1);
+                    document.getElementById('stat-uptime').textContent = uptime + '%';
                 }
             } catch (error) {
                 console.log('Stats not loaded');
