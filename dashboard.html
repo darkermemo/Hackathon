@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nafath SaaS Dashboard - لوحة تحكم المنصة</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary: #00965e;
+            --primary-dark: #007a4d;
+            --navy: #003d5b;
+            --success: #28a745;
+            --warning: #ffc107;
+            --danger: #dc3545;
+            --info: #17a2b8;
+            --light: #f8f9fa;
+            --dark: #212529;
+            --gray: #6c757d;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Cairo', sans-serif;
+            background: #f0f2f5;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .dashboard-header {
+            background: linear-gradient(135deg, var(--navy) 0%, #00496b 100%);
+            color: white;
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .header-brand {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-brand img {
+            height: 50px;
+        }
+
+        .header-brand h1 {
+            font-size: 1.5rem;
+            font-weight: 700;
+        }
+
+        .header-brand span {
+            font-size: 0.9rem;
+            opacity: 0.8;
+        }
+
+        .header-user {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .header-user .avatar {
+            width: 40px;
+            height: 40px;
+            background: var(--primary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .live-indicator {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+        }
+
+        .live-dot {
+            width: 10px;
+            height: 10px;
+            background: #28a745;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+
+            0%,
+            100% {
+                opacity: 1;
+            }
+
+            50% {
+                opacity: 0.5;
+            }
+        }
+
+        /* Main Content */
+        .dashboard-content {
+            padding: 2rem;
+            max-width: 1600px;
+            margin: 0 auto;
+        }
+
+        .section-title {
+            font-size: 1.3rem;
+            color: var(--navy);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        /* Stats Grid */
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .stat-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            right: 0;
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            opacity: 0.1;
+            transform: translate(30%, -30%);
+        }
+
+        .stat-card.green::before {
+            background: var(--success);
+        }
+
+        .stat-card.blue::before {
+            background: var(--info);
+        }
+
+        .stat-card.orange::before {
+            background: var(--warning);
+        }
+
+        .stat-card.red::before {
+            background: var(--danger);
+        }
+
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 1rem;
+            font-size: 1.5rem;
+            color: white;
+        }
+
+        .stat-card.green .stat-icon {
+            background: var(--success);
+        }
+
+        .stat-card.blue .stat-icon {
+            background: var(--info);
+        }
+
+        .stat-card.orange .stat-icon {
+            background: var(--warning);
+        }
+
+        .stat-card.red .stat-icon {
+            background: var(--danger);
+        }
+
+        .stat-value {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--navy);
+        }
+
+        .stat-label {
+            color: var(--gray);
+            font-size: 0.95rem;
+        }
+
+        .stat-change {
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+            margin-top: 0.5rem;
+            font-size: 0.85rem;
+        }
+
+        .stat-change.up {
+            color: var(--success);
+        }
+
+        .stat-change.down {
+            color: var(--danger);
+        }
+
+        /* Entities Table */
+        .entities-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+            margin-bottom: 2rem;
+        }
+
+        .entities-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .entities-table th {
+            text-align: right;
+            padding: 1rem;
+            background: var(--light);
+            color: var(--navy);
+            font-weight: 700;
+            border-bottom: 2px solid #e9ecef;
+        }
+
+        .entities-table td {
+            padding: 1rem;
+            border-bottom: 1px solid #e9ecef;
+        }
+
+        .entities-table tr:hover {
+            background: #f8f9fa;
+        }
+
+        .entity-logo {
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.2rem;
+            color: white;
+        }
+
+        .entity-info {
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+        }
+
+        .entity-name h4 {
+            color: var(--navy);
+            font-size: 1rem;
+        }
+
+        .entity-name span {
+            color: var(--gray);
+            font-size: 0.85rem;
+        }
+
+        .status-badge {
+            padding: 0.3rem 0.8rem;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+
+        .status-badge.active {
+            background: #d4edda;
+            color: #155724;
+        }
+
+        .status-badge.trial {
+            background: #fff3cd;
+            color: #856404;
+        }
+
+        .contract-bar {
+            width: 100px;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+
+        .contract-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        /* Two Column Layout */
+        .two-columns {
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        /* Login Activity */
+        .activity-card {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .activity-chart {
+            height: 200px;
+            display: flex;
+            align-items: flex-end;
+            gap: 0.8rem;
+            padding: 1rem 0;
+        }
+
+        .chart-bar {
+            flex: 1;
+            background: linear-gradient(to top, var(--primary) 0%, #4caf50 100%);
+            border-radius: 8px 8px 0 0;
+            position: relative;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+
+        .chart-bar .bar-label {
+            position: absolute;
+            bottom: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.75rem;
+            color: var(--gray);
+        }
+
+        .chart-bar .bar-value {
+            position: absolute;
+            top: -25px;
+            left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--navy);
+        }
+
+        .chart-legend {
+            display: flex;
+            justify-content: center;
+            gap: 2rem;
+            margin-top: 2.5rem;
+            padding-top: 1rem;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .legend-item {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        .legend-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+        }
+
+        /* Security Stats */
+        .security-stats {
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .security-item {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .security-item .icon {
+            width: 45px;
+            height: 45px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .security-item .icon.green {
+            background: var(--success);
+        }
+
+        .security-item .icon.red {
+            background: var(--danger);
+        }
+
+        .security-item .icon.blue {
+            background: var(--info);
+        }
+
+        .security-item .icon.orange {
+            background: var(--warning);
+        }
+
+        .security-item .info h4 {
+            font-size: 1.5rem;
+            color: var(--navy);
+        }
+
+        .security-item .info span {
+            font-size: 0.85rem;
+            color: var(--gray);
+        }
+
+        /* Contract Details */
+        .contracts-section {
+            background: white;
+            border-radius: 16px;
+            padding: 1.5rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+
+        .contract-cards {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 1.5rem;
+        }
+
+        .contract-card {
+            border: 2px solid #e9ecef;
+            border-radius: 12px;
+            padding: 1.5rem;
+            text-align: center;
+            transition: all 0.3s;
+        }
+
+        .contract-card:hover {
+            border-color: var(--primary);
+            transform: translateY(-5px);
+        }
+
+        .contract-card.highlighted {
+            border-color: var(--primary);
+            background: linear-gradient(135deg, #e8f5e9 0%, #f1f8e9 100%);
+        }
+
+        .contract-tier {
+            font-size: 0.85rem;
+            color: var(--gray);
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .contract-price {
+            font-size: 2.5rem;
+            font-weight: 900;
+            color: var(--navy);
+            margin: 0.5rem 0;
+        }
+
+        .contract-price span {
+            font-size: 1rem;
+            font-weight: 400;
+            color: var(--gray);
+        }
+
+        .contract-features {
+            list-style: none;
+            text-align: right;
+            margin-top: 1.5rem;
+        }
+
+        .contract-features li {
+            padding: 0.5rem 0;
+            border-bottom: 1px solid #e9ecef;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .contract-features li:last-child {
+            border-bottom: none;
+        }
+
+        .contract-features i {
+            color: var(--success);
+        }
+
+        /* Footer Stats */
+        .footer-stats {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 1rem;
+            margin-top: 2rem;
+        }
+
+        .footer-stat {
+            background: white;
+            border-radius: 12px;
+            padding: 1.2rem;
+            text-align: center;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .footer-stat .value {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--primary);
+        }
+
+        .footer-stat .label {
+            font-size: 0.85rem;
+            color: var(--gray);
+            margin-top: 0.3rem;
+        }
+
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+
+            .two-columns {
+                grid-template-columns: 1fr;
+            }
+
+            .contract-cards {
+                grid-template-columns: 1fr;
+            }
+
+            .footer-stats {
+                grid-template-columns: repeat(3, 1fr);
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <!-- Header -->
+    <header class="dashboard-header">
+        <div class="header-brand">
+            <img src="mofa_logo.svg" alt="MOFA" onerror="this.style.display='none'">
+            <div>
+                <h1>Nafath SaaS Platform</h1>
+                <span>منصة نفاذ السحابية للجهات الحكومية</span>
+            </div>
+        </div>
+        <div class="header-user">
+            <div class="live-indicator">
+                <div class="live-dot"></div>
+                <span>Live Dashboard</span>
+            </div>
+            <div class="avatar">
+                <i class="fas fa-user"></i>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="dashboard-content">
+
+        <!-- Main Stats -->
+        <section>
+            <h2 class="section-title"><i class="fas fa-chart-line"></i> إحصائيات المنصة</h2>
+            <div class="stats-grid">
+                <div class="stat-card green">
+                    <div class="stat-icon"><i class="fas fa-building"></i></div>
+                    <div class="stat-value">7</div>
+                    <div class="stat-label">جهات حكومية مشتركة</div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up"></i> +2 هذا الشهر</div>
+                </div>
+                <div class="stat-card blue">
+                    <div class="stat-icon"><i class="fas fa-users"></i></div>
+                    <div class="stat-value">1,247</div>
+                    <div class="stat-label">مستخدم نشط</div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up"></i> +156 هذا الأسبوع</div>
+                </div>
+                <div class="stat-card orange">
+                    <div class="stat-icon"><i class="fas fa-sign-in-alt"></i></div>
+                    <div class="stat-value">8,432</div>
+                    <div class="stat-label">عملية تسجيل دخول (الشهر)</div>
+                    <div class="stat-change up"><i class="fas fa-arrow-up"></i> +23% عن الشهر الماضي</div>
+                </div>
+                <div class="stat-card red">
+                    <div class="stat-icon"><i class="fas fa-shield-alt"></i></div>
+                    <div class="stat-value">47</div>
+                    <div class="stat-label">محاولة وصول محظورة</div>
+                    <div class="stat-change down"><i class="fas fa-arrow-down"></i> -12% تحسن أمني</div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Entities Table -->
+        <section class="entities-section">
+            <h2 class="section-title"><i class="fas fa-landmark"></i> الجهات المشتركة (Tenants)</h2>
+            <table class="entities-table">
+                <thead>
+                    <tr>
+                        <th>الجهة</th>
+                        <th>المستخدمين</th>
+                        <th>تسجيل الدخول (الشهر)</th>
+                        <th>المحاولات الفاشلة</th>
+                        <th>العقد</th>
+                        <th>الحالة</th>
+                        <th>المتبقي</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>
+                            <div class="entity-info">
+                                <div class="entity-logo" style="background: #00965e;">🏛️</div>
+                                <div class="entity-name">
+                                    <h4>وزارة الخارجية</h4>
+                                    <span>MOFA</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>156</strong></td>
+                        <td>1,892</td>
+                        <td><span style="color: #dc3545;">12</span></td>
+                        <td>Enterprise</td>
+                        <td><span class="status-badge active">نشط</span></td>
+                        <td>
+                            <div class="contract-bar">
+                                <div class="contract-fill" style="width: 75%; background: #28a745;"></div>
+                            </div>
+                            <small>9 أشهر</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="entity-info">
+                                <div class="entity-logo" style="background: #1976d2;">🛡️</div>
+                                <div class="entity-name">
+                                    <h4>وزارة الداخلية</h4>
+                                    <span>MOI</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>423</strong></td>
+                        <td>3,156</td>
+                        <td><span style="color: #dc3545;">18</span></td>
+                        <td>Enterprise</td>
+                        <td><span class="status-badge active">نشط</span></td>
+                        <td>
+                            <div class="contract-bar">
+                                <div class="contract-fill" style="width: 50%; background: #ffc107;"></div>
+                            </div>
+                            <small>6 أشهر</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="entity-info">
+                                <div class="entity-logo" style="background: #e65100;">🏥</div>
+                                <div class="entity-name">
+                                    <h4>وزارة الصحة</h4>
+                                    <span>MOH</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>312</strong></td>
+                        <td>2,104</td>
+                        <td><span style="color: #dc3545;">8</span></td>
+                        <td>Professional</td>
+                        <td><span class="status-badge active">نشط</span></td>
+                        <td>
+                            <div class="contract-bar">
+                                <div class="contract-fill" style="width: 90%; background: #28a745;"></div>
+                            </div>
+                            <small>11 شهر</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="entity-info">
+                                <div class="entity-logo" style="background: #7b1fa2;">📚</div>
+                                <div class="entity-name">
+                                    <h4>وزارة التعليم</h4>
+                                    <span>MOE</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>189</strong></td>
+                        <td>756</td>
+                        <td><span style="color: #dc3545;">5</span></td>
+                        <td>Professional</td>
+                        <td><span class="status-badge trial">تجريبي</span></td>
+                        <td>
+                            <div class="contract-bar">
+                                <div class="contract-fill" style="width: 20%; background: #dc3545;"></div>
+                            </div>
+                            <small>14 يوم</small>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>
+                            <div class="entity-info">
+                                <div class="entity-logo" style="background: #00838f;">💼</div>
+                                <div class="entity-name">
+                                    <h4>وزارة المالية</h4>
+                                    <span>MOF</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td><strong>98</strong></td>
+                        <td>524</td>
+                        <td><span style="color: #dc3545;">2</span></td>
+                        <td>Starter</td>
+                        <td><span class="status-badge active">نشط</span></td>
+                        <td>
+                            <div class="contract-bar">
+                                <div class="contract-fill" style="width: 60%; background: #28a745;"></div>
+                            </div>
+                            <small>7 أشهر</small>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+        </section>
+
+        <!-- Two Column Section -->
+        <div class="two-columns">
+            <!-- Login Activity Chart -->
+            <div class="activity-card">
+                <h2 class="section-title"><i class="fas fa-chart-bar"></i> نشاط تسجيل الدخول (آخر 7 أيام)</h2>
+                <div class="activity-chart">
+                    <div class="chart-bar" style="height: 60%;">
+                        <span class="bar-value">892</span>
+                        <span class="bar-label">السبت</span>
+                    </div>
+                    <div class="chart-bar" style="height: 85%;">
+                        <span class="bar-value">1,245</span>
+                        <span class="bar-label">الأحد</span>
+                    </div>
+                    <div class="chart-bar" style="height: 90%;">
+                        <span class="bar-value">1,356</span>
+                        <span class="bar-label">الاثنين</span>
+                    </div>
+                    <div class="chart-bar" style="height: 78%;">
+                        <span class="bar-value">1,102</span>
+                        <span class="bar-label">الثلاثاء</span>
+                    </div>
+                    <div class="chart-bar" style="height: 95%;">
+                        <span class="bar-value">1,478</span>
+                        <span class="bar-label">الأربعاء</span>
+                    </div>
+                    <div class="chart-bar" style="height: 70%;">
+                        <span class="bar-value">987</span>
+                        <span class="bar-label">الخميس</span>
+                    </div>
+                    <div class="chart-bar" style="height: 45%;">
+                        <span class="bar-value">572</span>
+                        <span class="bar-label">الجمعة</span>
+                    </div>
+                </div>
+                <div class="chart-legend">
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--primary);"></div>
+                        <span>تسجيلات ناجحة</span>
+                    </div>
+                    <div class="legend-item">
+                        <div class="legend-dot" style="background: var(--danger);"></div>
+                        <span>محاولات فاشلة</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Security Stats -->
+            <div class="security-stats">
+                <h2 class="section-title"><i class="fas fa-shield-alt"></i> إحصائيات الأمان</h2>
+                <div class="security-item">
+                    <div class="icon green"><i class="fas fa-check-circle"></i></div>
+                    <div class="info">
+                        <h4>99.9%</h4>
+                        <span>نسبة التوفر (Uptime)</span>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <div class="icon red"><i class="fas fa-ban"></i></div>
+                    <div class="info">
+                        <h4>47</h4>
+                        <span>تهديدات محظورة هذا الشهر</span>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <div class="icon blue"><i class="fas fa-clock"></i></div>
+                    <div class="info">
+                        <h4>&lt;5 دقائق</h4>
+                        <span>زمن الاستجابة للتهديدات</span>
+                    </div>
+                </div>
+                <div class="security-item">
+                    <div class="icon orange"><i class="fas fa-eye"></i></div>
+                    <div class="info">
+                        <h4>24/7</h4>
+                        <span>مراقبة SOC مستمرة</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Contract Tiers -->
+        <section class="contracts-section">
+            <h2 class="section-title"><i class="fas fa-file-contract"></i> باقات الاشتراك</h2>
+            <div class="contract-cards">
+                <div class="contract-card">
+                    <div class="contract-tier">Starter</div>
+                    <div class="contract-price">25,000 <span>ر.س/سنة</span></div>
+                    <ul class="contract-features">
+                        <li><i class="fas fa-check"></i> حتى 100 مستخدم</li>
+                        <li><i class="fas fa-check"></i> SDK أساسي</li>
+                        <li><i class="fas fa-check"></i> RBAC بسيط</li>
+                        <li><i class="fas fa-check"></i> دعم بريد إلكتروني</li>
+                        <li><i class="fas fa-check"></i> تقارير شهرية</li>
+                    </ul>
+                </div>
+                <div class="contract-card highlighted">
+                    <div class="contract-tier">Professional</div>
+                    <div class="contract-price">75,000 <span>ر.س/سنة</span></div>
+                    <ul class="contract-features">
+                        <li><i class="fas fa-check"></i> حتى 500 مستخدم</li>
+                        <li><i class="fas fa-check"></i> SDK متقدم + API</li>
+                        <li><i class="fas fa-check"></i> RBAC كامل</li>
+                        <li><i class="fas fa-check"></i> SIEM Integration</li>
+                        <li><i class="fas fa-check"></i> دعم 24/5</li>
+                    </ul>
+                </div>
+                <div class="contract-card">
+                    <div class="contract-tier">Enterprise</div>
+                    <div class="contract-price">150,000 <span>ر.س/سنة</span></div>
+                    <ul class="contract-features">
+                        <li><i class="fas fa-check"></i> مستخدمين غير محدود</li>
+                        <li><i class="fas fa-check"></i> SDK + API + Webhooks</li>
+                        <li><i class="fas fa-check"></i> RBAC + UBA + MDR</li>
+                        <li><i class="fas fa-check"></i> SIEM + SOC كامل</li>
+                        <li><i class="fas fa-check"></i> دعم 24/7 + SLA</li>
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <!-- Footer Stats -->
+        <div class="footer-stats">
+            <div class="footer-stat">
+                <div class="value">234ms</div>
+                <div class="label">متوسط زمن الاستجابة</div>
+            </div>
+            <div class="footer-stat">
+                <div class="value">17</div>
+                <div class="label">صلاحية RBAC</div>
+            </div>
+            <div class="footer-stat">
+                <div class="value">6</div>
+                <div class="label">تكاملات نشطة</div>
+            </div>
+            <div class="footer-stat">
+                <div class="value">3</div>
+                <div class="label">أدوار وظيفية</div>
+            </div>
+            <div class="footer-stat">
+                <div class="value">∞</div>
+                <div class="label">قابلية التوسع</div>
+            </div>
+        </div>
+
+    </main>
+
+</body>
+
+</html>
