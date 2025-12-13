@@ -943,6 +943,138 @@
 
     </main>
 
+    <script>
+        // API Base URL
+        const API_BASE = 'http://127.0.0.1:5002';
+
+        // Format number with commas
+        function formatNumber(num) {
+            return num ? num.toLocaleString('ar-SA') : '0';
+        }
+
+        // Load Dashboard Stats
+        async function loadDashboardStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const stats = data.stats;
+                    // Update stat cards (by order)
+                    const statValues = document.querySelectorAll('.stat-value');
+                    if (statValues.length >= 5) {
+                        statValues[0].textContent = formatNumber(stats.total_tenants);
+                        statValues[1].textContent = formatNumber(stats.total_users);
+                        statValues[2].textContent = formatNumber(stats.monthly_logins);
+                        statValues[3].textContent = formatNumber(stats.blocked_attempts);
+                        statValues[4].textContent = formatNumber(Math.round(stats.total_revenue / 1000)) + 'K';
+                    }
+                }
+            } catch (error) {
+                console.log('API not available, using static data');
+            }
+        }
+
+        // Load Tenants
+        async function loadTenants() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tenants`);
+                const data = await response.json();
+
+                if (data.success && data.tenants) {
+                    const tbody = document.querySelector('.entities-table tbody');
+                    if (tbody) {
+                        tbody.innerHTML = '';
+                        data.tenants.forEach(tenant => {
+                            const contractRemaining = calculateContractRemaining(tenant.contract_end);
+                            const row = document.createElement('tr');
+                            row.innerHTML = `
+                                <td>
+                                    <div class="entity-info">
+                                        <div class="entity-logo" style="background: ${tenant.color};">${tenant.logo_emoji}</div>
+                                        <div class="entity-name">
+                                            <h4>${tenant.name_ar}</h4>
+                                            <span>${tenant.code}</span>
+                                        </div>
+                                    </div>
+                                </td>
+                                <td><strong>${tenant.user_count}</strong></td>
+                                <td>${formatNumber(tenant.monthly_logins)}</td>
+                                <td><span style="color: #dc3545;">${tenant.monthly_failures || 0}</span></td>
+                                <td>${capitalizeFirst(tenant.contract_tier)}</td>
+                                <td><span class="status-badge active">نشط</span></td>
+                                <td>
+                                    <div class="contract-bar">
+                                        <div class="contract-fill" style="width: ${contractRemaining.percent}%; background: ${contractRemaining.color};"></div>
+                                    </div>
+                                    <small>${contractRemaining.text}</small>
+                                </td>
+                                <td>
+                                    <a href="/tenant-dashboard?id=${tenant.id}" style="display: inline-flex; align-items: center; gap: 0.3rem; padding: 0.4rem 0.8rem; background: ${tenant.color}; color: white; border-radius: 6px; text-decoration: none; font-size: 0.85rem;">
+                                        <i class="fas fa-cog"></i> إدارة
+                                    </a>
+                                </td>
+                            `;
+                            tbody.appendChild(row);
+                        });
+                    }
+                }
+            } catch (error) {
+                console.log('Could not load tenants from API');
+            }
+        }
+
+        // Calculate contract remaining
+        function calculateContractRemaining(endDate) {
+            const end = new Date(endDate);
+            const now = new Date();
+            const diffDays = Math.ceil((end - now) / (1000 * 60 * 60 * 24));
+
+            if (diffDays <= 0) return { percent: 0, color: '#dc3545', text: 'منتهي' };
+            if (diffDays <= 30) return { percent: 20, color: '#dc3545', text: `${diffDays} يوم` };
+            if (diffDays <= 90) return { percent: 40, color: '#ffc107', text: `${Math.round(diffDays / 30)} أشهر` };
+            if (diffDays <= 180) return { percent: 60, color: '#ffc107', text: `${Math.round(diffDays / 30)} أشهر` };
+            return { percent: 80, color: '#28a745', text: `${Math.round(diffDays / 30)} أشهر` };
+        }
+
+        function capitalizeFirst(str) {
+            return str ? str.charAt(0).toUpperCase() + str.slice(1) : '';
+        }
+
+        // Load login chart data
+        async function loadLoginChart() {
+            try {
+                const response = await fetch(`${API_BASE}/api/dashboard/stats`);
+                const data = await response.json();
+
+                if (data.success && data.login_history) {
+                    const chartBars = document.querySelectorAll('.chart-bar');
+                    data.login_history.slice(0, 7).forEach((day, i) => {
+                        if (chartBars[6 - i]) {
+                            const height = Math.min(100, (day.successful_logins / 300) * 100);
+                            chartBars[6 - i].style.height = `${height}%`;
+                            chartBars[6 - i].setAttribute('data-value', day.successful_logins);
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Chart data not loaded');
+            }
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadDashboardStats();
+            loadTenants();
+            loadLoginChart();
+
+            // Refresh every 30 seconds
+            setInterval(() => {
+                loadDashboardStats();
+            }, 30000);
+        });
+    </script>
+
 </body>
 
 </html>

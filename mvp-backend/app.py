@@ -27,14 +27,63 @@ from auth import (
 from uba_service import (
     analyze_behavior, analyze_login, get_user_risk_profile
 )
+import os
 
-# Initialize Flask app
-app = Flask(__name__)
+# Get parent directory for static files
+PARENT_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+
+# Initialize Flask app with static files from parent directory
+app = Flask(__name__, 
+            static_folder=PARENT_DIR,
+            static_url_path='/static')
 CORS(app)
 
 # =====================================
 # HEALTH & INFO
 # =====================================
+
+@app.route('/')
+def index():
+    """Root route - API info"""
+    return jsonify({
+        'name': 'Nafath SSO MVP API',
+        'version': '2.0.0',
+        'status': 'running',
+        'endpoints': {
+            'health': '/api/health',
+            'tenants': '/api/tenants',
+            'users': '/api/users',
+            'dashboard': '/api/dashboard/stats',
+            'uba': '/api/uba/score'
+        },
+        'html_pages': {
+            'dashboard': '/dashboard',
+            'tenant_dashboard': '/tenant-dashboard',
+            'uba_demo': '/uba-demo',
+            'main_demo': '/demo'
+        },
+        'documentation': 'Use /api/health to check status'
+    })
+
+@app.route('/dashboard')
+def serve_dashboard():
+    """Serve SaaS Dashboard"""
+    return app.send_static_file('dashboard.html')
+
+@app.route('/tenant-dashboard')
+def serve_tenant_dashboard():
+    """Serve Tenant Dashboard"""
+    return app.send_static_file('tenant-dashboard.html')
+
+@app.route('/uba-demo')
+def serve_uba_demo():
+    """Serve UBA Demo"""
+    return app.send_static_file('uba-demo.html')
+
+@app.route('/demo')
+def serve_main_demo():
+    """Serve Main Demo"""
+    return app.send_static_file('index.html')
 
 @app.route('/api/health', methods=['GET'])
 def health():
@@ -600,4 +649,4 @@ if __name__ == '__main__':
     print("   GET  /api/dashboard/revenue  - Total revenue")
     print("\n" + "=" * 60)
     
-    app.run(host='0.0.0.0', port=5002, debug=True)
+    app.run(host='0.0.0.0', port=5002, debug=False, threaded=True)
