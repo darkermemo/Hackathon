@@ -53,15 +53,16 @@ def generate_anomaly_data(n=500):
 
 def train_and_save():
     print("Generating training data...")
-    normal_df = generate_normal_data(4500)
-    anomaly_df = generate_anomaly_data(500)
+    # Increased scale: 25,000 total records
+    normal_df = generate_normal_data(22500)
+    anomaly_df = generate_anomaly_data(2500)
     
     # Combine datasets
     train_df = pd.concat([normal_df, anomaly_df], ignore_index=True)
     
     print(f"Training data shape: {train_df.shape}")
-    print("Normal samples: 4500")
-    print("Anomaly samples: 500")
+    print("Normal samples: 22,500")
+    print("Anomaly samples: 2,500")
     
     # Train Isolation Forest
     # contamination=0.1 means we expect about 10% anomalies in the training set
