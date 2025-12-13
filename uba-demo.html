@@ -572,27 +572,27 @@
                 <div class="model-specs">
                     <div class="spec-item">
                         <span class="spec-label">اسم النموذج</span>
-                        <span class="spec-value">Nafath-UBA-v2.1</span>
+                        <span class="spec-value" id="spec-name">Nafath-UBA-v2.1</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">الخوارزمية</span>
-                        <span class="spec-value">Isolation Forest + LSTM</span>
+                        <span class="spec-value" id="spec-algorithm">Isolation Forest + LSTM</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">نوع التعلم</span>
-                        <span class="spec-value">Unsupervised + Supervised</span>
+                        <span class="spec-value" id="spec-learning">Unsupervised + Supervised</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">دقة الكشف</span>
-                        <span class="spec-value">97.3%</span>
+                        <span class="spec-value" id="spec-accuracy">---%</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">زمن الاستجابة</span>
-                        <span class="spec-value">&lt;50ms</span>
+                        <span class="spec-value" id="spec-response-time">---ms</span>
                     </div>
                     <div class="spec-item">
                         <span class="spec-label">نقاط البيانات المحللة</span>
-                        <span class="spec-value">15+ Feature</span>
+                        <span class="spec-value" id="spec-features">--- Feature</span>
                     </div>
                 </div>
             </div>
@@ -915,6 +915,28 @@
             addLogItem('shield-alt', 'danger', '🚨 تم إرسال تنبيه SOC', '03:47 - MDR notified', '+0', '#dc3545');
             updateRiskGauge(result.risk_score);
         }
+
+        // Load model info from API
+        async function loadModelInfo() {
+            try {
+                const response = await fetch('/api/uba/model-info');
+                const data = await response.json();
+
+                if (data.success) {
+                    document.getElementById('spec-name').textContent = data.model_name;
+                    document.getElementById('spec-algorithm').textContent = data.algorithm;
+                    document.getElementById('spec-learning').textContent = data.learning_type;
+                    document.getElementById('spec-accuracy').textContent = data.accuracy.toFixed(1) + '%';
+                    document.getElementById('spec-response-time').textContent = '<' + Math.ceil(data.response_time_ms) + 'ms';
+                    document.getElementById('spec-features').textContent = data.features_count + ' Features';
+                }
+            } catch (e) {
+                console.error('Failed to load model info:', e);
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', loadModelInfo);
     </script>
 
 </body>
