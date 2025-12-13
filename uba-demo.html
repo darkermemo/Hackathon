@@ -826,37 +826,94 @@
             log.insertBefore(item, log.firstChild);
         }
 
-        function simulateNormalBehavior() {
+        async function getRiskScore(data) {
+            try {
+                const response = await fetch('/api/uba/score', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(data)
+                });
+                const result = await response.json();
+                return result;
+            } catch (e) {
+                console.error('API Error:', e);
+                return { risk_score: 0, status: 'error' };
+            }
+        }
+
+        async function simulateNormalBehavior() {
             document.getElementById('login-time').textContent = '09:15';
             document.getElementById('location').textContent = 'الرياض';
             document.getElementById('device').textContent = 'معروف';
             document.getElementById('actions').textContent = '8';
 
-            addLogItem('file-alt', 'normal', 'عرض تقرير شهري', '09:15 - صلاحية مسموحة', '+1', '#28a745');
-            updateRiskGauge(12);
+            // Real data for AI model
+            const behavior = {
+                login_hour: 9,
+                location_id: 0,
+                is_new_device: false,
+                actions_count: 8,
+                files_accessed: 2,
+                session_duration: 30,
+                failed_logins: 0,
+                sensitive_access: 0
+            };
+
+            const result = await getRiskScore(behavior);
+
+            addLogItem('file-alt', 'normal', 'عرض تقرير شهري', '09:15 - صلاحية مسموحة', 'Safe', '#28a745');
+            updateRiskGauge(result.risk_score);
         }
 
-        function simulateSuspiciousBehavior() {
+        async function simulateSuspiciousBehavior() {
             document.getElementById('login-time').textContent = '02:30';
             document.getElementById('location').textContent = 'جدة';
             document.getElementById('device').textContent = 'جديد';
             document.getElementById('actions').textContent = '47';
 
-            addLogItem('exclamation-triangle', 'warning', 'دخول من موقع جديد', '02:30 - جدة - جهاز غير معروف', '+25', '#ffc107');
-            addLogItem('download', 'warning', 'تحميل ملفات متعددة', '02:35 - 15 ملف في 5 دقائق', '+18', '#ffc107');
-            updateRiskGauge(55);
+            // Suspicious data for AI model
+            const behavior = {
+                login_hour: 2,
+                location_id: 1, // Jeddah
+                is_new_device: true,
+                actions_count: 47,
+                files_accessed: 15,
+                session_duration: 10,
+                failed_logins: 1,
+                sensitive_access: 3
+            };
+
+            const result = await getRiskScore(behavior);
+
+            addLogItem('exclamation-triangle', 'warning', 'دخول من موقع جديد', '02:30 - جدة - جهاز غير معروف', 'Risk', '#ffc107');
+            addLogItem('download', 'warning', 'تحميل ملفات متعددة', '02:35 - 15 ملف في 5 دقائق', 'Risk', '#ffc107');
+            updateRiskGauge(result.risk_score);
         }
 
-        function simulateAttack() {
+        async function simulateAttack() {
             document.getElementById('login-time').textContent = '03:45';
-            document.getElementById('location').textContent = 'خارج المملكة';
-            document.getElementById('device').textContent = 'مجهول';
-            document.getElementById('actions').textContent = '156';
+            document.getElementById('location').textContent = 'مجهول (IP خارجي)';
+            document.getElementById('device').textContent = 'Unknown/Linux';
+            document.getElementById('actions').textContent = '124';
 
-            addLogItem('skull-crossbones', 'danger', '⚠️ محاولة وصول غير مصرح', '03:45 - IP خارجي مشبوه', '+40', '#dc3545');
-            addLogItem('database', 'danger', '⚠️ محاولة تصدير قاعدة البيانات', '03:47 - تم الحظر تلقائياً', '+35', '#dc3545');
+            // Attack data for AI model
+            const behavior = {
+                login_hour: 3,
+                location_id: 4, // Unknown
+                is_new_device: true,
+                actions_count: 124,
+                files_accessed: 50,
+                session_duration: 5,
+                failed_logins: 3,
+                sensitive_access: 10
+            };
+
+            const result = await getRiskScore(behavior);
+
+            addLogItem('user-secret', 'danger', 'محاولة اختراق كلمات مرور', '03:45 - Brute Force', 'CRITICAL', '#dc3545');
+            addLogItem('database', 'danger', 'محاولة استخراج قاعدة بيانات', '03:46 - SQL Injection Attempt', 'CRITICAL', '#dc3545');
             addLogItem('shield-alt', 'danger', '🚨 تم إرسال تنبيه SOC', '03:47 - MDR notified', '+0', '#dc3545');
-            updateRiskGauge(92);
+            updateRiskGauge(result.risk_score);
         }
     </script>
 
