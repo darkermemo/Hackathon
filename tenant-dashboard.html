@@ -901,9 +901,9 @@
                 const rolesData = await rolesRes.json();
 
                 if (statsData.success) {
-                    document.getElementById('stat-users').textContent = statsData.stats.total_users || 0;
+                    document.getElementById('stat-users').textContent = (statsData.stats.total_users || 0).toLocaleString('en-US');
                     document.getElementById('stat-logins').textContent =
-                        (statsData.stats.monthly_logins || 0).toLocaleString();
+                        (statsData.stats.monthly_logins || 0).toLocaleString('en-US');
                 }
 
                 if (rolesData.success && rolesData.roles) {
