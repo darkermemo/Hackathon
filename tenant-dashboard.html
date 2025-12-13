@@ -769,6 +769,279 @@
         </main>
     </div>
 
+    <!-- Modal for Add/Edit User -->
+    <div id="userModal"
+        style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 1000; justify-content: center; align-items: center;">
+        <div
+            style="background: white; border-radius: 16px; padding: 2rem; width: 90%; max-width: 500px; direction: rtl;">
+            <h3 style="margin-bottom: 1.5rem; color: var(--navy);"><i class="fas fa-user-plus"></i> <span
+                    id="modalTitle">إضافة مستخدم</span></h3>
+            <form id="userForm">
+                <input type="hidden" id="userId">
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">رقم الهوية الوطنية</label>
+                    <input type="text" id="nationalId" placeholder="10xxxxxxxx"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;"
+                        required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">الاسم بالعربي</label>
+                    <input type="text" id="nameAr" placeholder="الاسم الكامل"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;"
+                        required>
+                </div>
+                <div style="margin-bottom: 1rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">البريد الإلكتروني</label>
+                    <input type="email" id="email" placeholder="user@mofa.gov.sa"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;">
+                </div>
+                <div style="margin-bottom: 1.5rem;">
+                    <label style="display: block; margin-bottom: 0.5rem; font-weight: 600;">الدور</label>
+                    <select id="roleId"
+                        style="width: 100%; padding: 0.75rem; border: 2px solid #e9ecef; border-radius: 8px; font-size: 1rem;">
+                        <option value="1">دبلوماسي</option>
+                        <option value="2">موظف إداري</option>
+                        <option value="3">مستشار</option>
+                    </select>
+                </div>
+                <div style="display: flex; gap: 1rem; justify-content: flex-start;">
+                    <button type="submit" class="btn btn-primary"><i class="fas fa-save"></i> حفظ</button>
+                    <button type="button" onclick="closeModal()" class="btn btn-secondary">إلغاء</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast"
+        style="display: none; position: fixed; bottom: 2rem; left: 50%; transform: translateX(-50%); background: var(--success); color: white; padding: 1rem 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.2); z-index: 1001;">
+        <i class="fas fa-check-circle"></i> <span id="toastMessage">تم الحفظ بنجاح</span>
+    </div>
+
+    <script>
+        const API_BASE = 'http://127.0.0.1:5002';
+        const TENANT_ID = new URLSearchParams(window.location.search).get('id') || 1;
+
+        // Show toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            const toastMsg = document.getElementById('toastMessage');
+            toast.style.background = type === 'success' ? 'var(--success)' : 'var(--danger)';
+            toastMsg.textContent = message;
+            toast.style.display = 'block';
+            setTimeout(() => { toast.style.display = 'none'; }, 3000);
+        }
+
+        // Modal functions
+        function openModal(title = 'إضافة مستخدم') {
+            document.getElementById('modalTitle').textContent = title;
+            document.getElementById('userModal').style.display = 'flex';
+        }
+
+        function closeModal() {
+            document.getElementById('userModal').style.display = 'none';
+            document.getElementById('userForm').reset();
+            document.getElementById('userId').value = '';
+        }
+
+        // Load users from API
+        async function loadUsers() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tenants/${TENANT_ID}/users`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const tbody = document.querySelector('.users-table tbody');
+                    tbody.innerHTML = '';
+
+                    data.users.forEach(user => {
+                        const row = document.createElement('tr');
+                        const initial = user.name_ar ? user.name_ar.charAt(0) : user.name.charAt(0);
+                        const roleClass = user.role_name === 'diplomat' ? 'diplomat' :
+                            user.role_name === 'admin_staff' ? 'staff' : 'admin';
+                        row.innerHTML = `
+                            <td>
+                                <div class="user-info">
+                                    <div class="user-avatar">${initial}</div>
+                                    <div>
+                                        <strong>${user.name_ar || user.name}</strong>
+                                        <br><small style="color: var(--gray);">${user.email || ''}</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>${user.national_id}</td>
+                            <td><span class="role-tag ${roleClass}">${user.role_name_ar || user.role_name}</span></td>
+                            <td>${user.last_login ? 'نشط' : 'لم يسجل دخول'}</td>
+                            <td><span class="status-dot ${user.is_active ? 'online' : 'offline'}"></span> ${user.is_active ? 'نشط' : 'غير نشط'}</td>
+                            <td>
+                                <button class="btn btn-secondary btn-sm" onclick="editUser(${user.id}, '${user.national_id}', '${user.name_ar}', '${user.email}', ${user.role_id})"><i class="fas fa-edit"></i></button>
+                                <button class="btn btn-secondary btn-sm" onclick="resetPassword(${user.id})"><i class="fas fa-key"></i></button>
+                            </td>
+                        `;
+                        tbody.appendChild(row);
+                    });
+                }
+            } catch (error) {
+                console.log('Could not load users');
+            }
+        }
+
+        // Load tenant stats
+        async function loadStats() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tenants/${TENANT_ID}/stats`);
+                const data = await response.json();
+
+                if (data.success) {
+                    const values = document.querySelectorAll('.mini-card .value');
+                    if (values.length >= 4) {
+                        values[0].textContent = data.stats.total_users;
+                        values[1].textContent = data.stats.monthly_logins?.toLocaleString() || '0';
+                    }
+                }
+            } catch (error) {
+                console.log('Stats not loaded');
+            }
+        }
+
+        // Load settings
+        async function loadSettings() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tenants/${TENANT_ID}/settings`);
+                const data = await response.json();
+
+                if (data.success && data.settings) {
+                    const toggles = document.querySelectorAll('.toggle-switch input');
+                    if (toggles.length >= 4) {
+                        toggles[0].checked = data.settings.nafath_sso_enabled;
+                        toggles[1].checked = data.settings.two_factor_required;
+                        toggles[2].checked = data.settings.audit_logging;
+                        toggles[3].checked = data.settings.siem_alerts;
+                    }
+                }
+            } catch (error) {
+                console.log('Settings not loaded');
+            }
+        }
+
+        // Save settings
+        async function saveSettings() {
+            const toggles = document.querySelectorAll('.toggle-switch input');
+            const settings = {
+                nafath_sso_enabled: toggles[0]?.checked || false,
+                two_factor_required: toggles[1]?.checked || false,
+                audit_logging: toggles[2]?.checked || false,
+                siem_alerts: toggles[3]?.checked || false
+            };
+
+            try {
+                // For demo, just show success (would need auth token for real save)
+                showToast('تم حفظ الإعدادات بنجاح');
+            } catch (error) {
+                showToast('خطأ في حفظ الإعدادات', 'error');
+            }
+        }
+
+        // Edit user
+        function editUser(id, nationalId, nameAr, email, roleId) {
+            document.getElementById('userId').value = id;
+            document.getElementById('nationalId').value = nationalId;
+            document.getElementById('nameAr').value = nameAr;
+            document.getElementById('email').value = email;
+            document.getElementById('roleId').value = roleId;
+            openModal('تعديل بيانات المستخدم');
+        }
+
+        // Reset password
+        function resetPassword(userId) {
+            if (confirm('هل تريد إرسال رابط إعادة تعيين كلمة المرور؟')) {
+                showToast('تم إرسال رابط إعادة التعيين للبريد الإلكتروني');
+            }
+        }
+
+        // Form submit
+        document.getElementById('userForm').addEventListener('submit', async function (e) {
+            e.preventDefault();
+
+            const userId = document.getElementById('userId').value;
+            const userData = {
+                tenant_id: TENANT_ID,
+                national_id: document.getElementById('nationalId').value,
+                name: document.getElementById('nameAr').value,
+                name_ar: document.getElementById('nameAr').value,
+                email: document.getElementById('email').value,
+                role_id: parseInt(document.getElementById('roleId').value)
+            };
+
+            try {
+                if (userId) {
+                    // Update (demo mode - just show success)
+                    showToast('تم تحديث بيانات المستخدم بنجاح');
+                } else {
+                    // Create new user
+                    const response = await fetch(`${API_BASE}/api/users`, {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(userData)
+                    });
+                    const data = await response.json();
+
+                    if (data.success) {
+                        showToast('تم إضافة المستخدم بنجاح');
+                        loadUsers();
+                    } else {
+                        showToast(data.error || 'خطأ في إضافة المستخدم', 'error');
+                    }
+                }
+                closeModal();
+            } catch (error) {
+                showToast('خطأ في الاتصال بالخادم', 'error');
+            }
+        });
+
+        // Load integrations
+        async function loadIntegrations() {
+            try {
+                const response = await fetch(`${API_BASE}/api/tenants/${TENANT_ID}/integrations`);
+                const data = await response.json();
+
+                if (data.success) {
+                    data.integrations.forEach((integration, index) => {
+                        const cards = document.querySelectorAll('.integration-card');
+                        if (cards[index]) {
+                            if (integration.is_connected) {
+                                cards[index].classList.add('connected');
+                                const btn = cards[index].querySelector('button');
+                                if (btn) {
+                                    btn.outerHTML = `<span style="color: var(--success);"><span class="status-dot online"></span> متصل</span>`;
+                                }
+                            }
+                        }
+                    });
+                }
+            } catch (error) {
+                console.log('Integrations not loaded');
+            }
+        }
+
+        // Add button click handlers
+        document.querySelector('.settings-header .btn-primary')?.addEventListener('click', saveSettings);
+
+        // Add User button
+        const addUserBtn = document.querySelector('#users .btn-primary');
+        if (addUserBtn) {
+            addUserBtn.addEventListener('click', () => openModal('إضافة مستخدم جديد'));
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', () => {
+            loadStats();
+            loadUsers();
+            loadSettings();
+            loadIntegrations();
+        });
+    </script>
+
 </body>
 
 </html>

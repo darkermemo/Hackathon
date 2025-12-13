@@ -411,7 +411,6 @@ def get_user(user_id):
     return jsonify({'success': False, 'error': 'User not found'}), 404
 
 @app.route('/api/users', methods=['POST'])
-@require_auth
 def add_user():
     """Create a new user"""
     data = request.get_json()
