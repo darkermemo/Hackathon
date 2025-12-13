@@ -101,6 +101,12 @@ def serve_script():
     from flask import send_from_directory
     return send_from_directory(PARENT_DIR, 'script.js')
 
+@app.route('/slides')
+def serve_slides():
+    """Serve HLD Slides"""
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'slides.html')
+
 @app.route('/api/health', methods=['GET'])
 def health():
     """Health check endpoint"""
