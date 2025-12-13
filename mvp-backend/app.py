@@ -68,22 +68,38 @@ def index():
 @app.route('/dashboard')
 def serve_dashboard():
     """Serve SaaS Dashboard"""
-    return app.send_static_file('dashboard.html')
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'dashboard.html')
 
 @app.route('/tenant-dashboard')
 def serve_tenant_dashboard():
     """Serve Tenant Dashboard"""
-    return app.send_static_file('tenant-dashboard.html')
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'tenant-dashboard.html')
 
 @app.route('/uba-demo')
 def serve_uba_demo():
     """Serve UBA Demo"""
-    return app.send_static_file('uba-demo.html')
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'uba-demo.html')
 
 @app.route('/demo')
 def serve_main_demo():
     """Serve Main Demo"""
-    return app.send_static_file('index.html')
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'index.html')
+
+@app.route('/styles.css')
+def serve_styles():
+    """Serve CSS"""
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'styles.css')
+
+@app.route('/script.js')
+def serve_script():
+    """Serve JS"""
+    from flask import send_from_directory
+    return send_from_directory(PARENT_DIR, 'script.js')
 
 @app.route('/api/health', methods=['GET'])
 def health():
